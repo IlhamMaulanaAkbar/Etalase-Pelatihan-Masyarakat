@@ -13,11 +13,12 @@
 </head>
 
 <body>
-        @include('layouts.partials.header-public')
+    @include('layouts.partials.header-public')
     <div>
         @yield('content')
     </div>
-        @include('layouts.partials.footer-public')
+    @include('layouts.partials.footer-public')
+    @stack('scripts')
 </body>
 
 </html>

@@ -2,7 +2,7 @@ import $ from 'jquery';
 window.$ = $;
 window.jQuery = $;
 
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
 import 'datatables.net-bs5';

@@ -18,15 +18,27 @@
                                 @csrf
                                 <div class="mb-3">
                                     <label for="video_name" class="form-label">Judul Video</label>
-                                    <input type="text" class="form-control" id="video_name" name="video_name">
+                                    <input type="text" class="form-control" id="video_name" name="video_name"
+                                        value="{{ old('video_name') }}">
+                                    @error('video_name')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="mb-3">
                                     <label for="uploaded_at" class="form-label">Diupload Tanggal</label>
-                                    <input type="date" class="form-control" id="uploaded_at" name="uploaded_at">
+                                    <input type="date" class="form-control" id="uploaded_at" name="uploaded_at"
+                                        value="{{ old('uploaded_at') }}">
+                                    @error('uploaded_at')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="mb-3">
                                     <label for="video_url" class="form-label">Link Video Youtube</label>
-                                    <input type="url" class="form-control" id="video_url" name="video_url">
+                                    <input type="url" class="form-control" id="video_url" name="video_url"
+                                        value="{{ old('video_url') }}">
+                                    @error('video_url')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </form>

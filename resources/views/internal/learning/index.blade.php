@@ -44,10 +44,10 @@
                                                 <p class="mb-0 fs-2 fw-normal">{{ $loop->iteration }}</p>
                                             </td>
                                             <td>
-                                                <div class="me-4">
-                                                    <img src="{{ $learning->thumbnail }}"
-                                                        alt="Thumbnail Video"
-                                                        style="width: 100px; height: auto; border-radius: 8px;">
+                                                <div class="position-relative overflow-hidden rounded-top"
+                                                    style="aspect-ratio: 16 / 9;">
+                                                    <img src="{{ $learning->thumbnail }}" alt="Thumbnail Video"
+                                                        class="img-fluid w-100 h-100 object-fit-cover rounded">
                                                 </div>
                                             </td>
                                             <td>

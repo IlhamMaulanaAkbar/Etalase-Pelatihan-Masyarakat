@@ -196,7 +196,7 @@
                 <div class="modal-body text-center">
                     <div class="input-group mb-3">
                         <input type="text" id="shareLink" class="form-control" readonly>
-                        <button class="btn btn-secondary" id="copyBtn">
+                        <button class="btn btn-primary" id="copyBtn">
                             <i class="ti ti-link"></i>
                         </button>
                     </div>

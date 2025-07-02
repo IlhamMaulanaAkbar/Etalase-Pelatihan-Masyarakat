@@ -39,16 +39,29 @@
                     <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
                         @foreach ($learnings as $learning)
                             <div class="col">
-                                <div class="card h-100 border-0 shadow-sm bg-light">
+                                <div class="h-100 border-0 rounded overflow-hidden">
                                     <button type="button" class="p-0 border-0 bg-transparent w-100" data-bs-toggle="modal"
-                                        data-bs-target="#videoModal" data-embed-url="{{ $learning->embedUrl }}">
-                                        <img src="{{ $learning->thumbnail }}" alt="Thumbnail Video"
-                                            class="img-fluid rounded-top" style="cursor: pointer;">
+                                        data-bs-target="#videoModal" data-video-url="{{ $learning->video_url }}">
+                                        <div class="position-relative overflow-hidden rounded-top"
+                                            style="aspect-ratio: 16 / 9;">
+                                            <img src="{{ $learning->thumbnail }}" alt="Thumbnail Video"
+                                                class="img-fluid w-100 h-100 object-fit-cover rounded" style="cursor: pointer;">
+                                            
+                                        </div>
                                     </button>
-                                    <div class="card-body">
+
+                                    <div class="py-3 px-3">
                                         <h6 class="fw-semibold mb-1 text-black">{{ $learning->video_name }}</h6>
-                                        <small
-                                            class="text-muted">{{ \Carbon\Carbon::parse($learning->uploaded_at)->format('d M Y') }}</small>
+                                        <div class="d-flex text-muted small gap-3 mt-">
+                                            <div>
+                                                <i class="ti ti-calendar-event me-1"></i>
+                                                {{ $learning->uploaded_at->format('d F Y') }}
+                                            </div>
+                                            <div>
+                                                <i class="ti ti-eye me-1"></i>
+                                                {{ $learning->views }}0 views
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -85,10 +98,10 @@
             <div class="modal-content border-0">
                 <div class="modal-body p-0">
                     <div class="ratio ratio-16x9">
-                        <iframe id="videoFrame" src="{{ $learning->embedUrl }}" title="YouTube video" allowfullscreen
-                            frameborder="0"
+                        <iframe id="videoFrame" src="" title="YouTube video" allowfullscreen frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
                         </iframe>
+
                     </div>
                 </div>
             </div>
@@ -106,13 +119,11 @@
                 const trigger = event.relatedTarget;
                 if (!trigger) return;
 
-                const videoUrl = trigger.getAttribute('data-video-url'); // ekspektasi: URL biasa
-                const embedUrl = convertToEmbedUrl(videoUrl); // harus jadi embed link
-                console.log("Embed URL:", embedUrl); // Pastikan ini muncul
+                const embedUrl = trigger.getAttribute('data-video-url');
+                console.log("Embed URL:", embedUrl);
 
-                videoFrame.src = embedUrl;
+                videoFrame.src = embedUrl + "?autoplay=1";
             });
-
 
             videoModal.addEventListener('hidden.bs.modal', function() {
                 videoFrame.src = '';
