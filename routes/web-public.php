@@ -31,4 +31,5 @@ Route::middleware(['guest:user'])->group(function () {
 Route::middleware(['auth:user'])->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('auth.user.logout.destroy');
     Route::get('/profile', [ProfileController::class, 'index'])->name('public.account.profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('public.account.profile.update');
 });

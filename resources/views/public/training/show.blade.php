@@ -114,10 +114,15 @@
                                 <div class="fw-semibold d-block">Batas Pendaftaran</div>
                                 <h5 class="fw-bolder text-black">{{ $training->deadline_date->format('d M Y') }}</h5>
                             </div>
-                            <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Tutup</span>
+                            <span class="badge bg-success rounded-pill px-4 py-2 fs-2">{{ $training->status }}</span>
                         </div>
                         <div class="mt-2">
-                            <button class="btn btn-danger w-100 rounded-pill fw-bold py-2 fs-5">TUTUP</button>
+                            <form method="POST" action="">
+                                @csrf
+                                <button type="submit" class="btn btn-primary w-100 rounded-pill fw-semibold py-2 fs-5">
+                                    Daftar
+                                </button>
+                            </form>
                         </div>
                         <hr>
                         <div class="p-3 mt-3">

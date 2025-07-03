@@ -16,6 +16,19 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'gender',
+        'date_of_birth',
+        'place_of_birth',
+        'province',
+        'city',
+        'district',
+        'village',
+        'job',
+        'education',
+        'education_institutions',
+        'religion',
+        'photo', // jika ingin menyimpan gambar nanti
     ];
 
     protected $hidden = [
