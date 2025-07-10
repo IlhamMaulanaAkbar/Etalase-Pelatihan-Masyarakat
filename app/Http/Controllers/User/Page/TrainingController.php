@@ -9,6 +9,7 @@ use App\Models\Category;
 use Illuminate\Support\Str;
 use App\Models\TrainingUser;
 use App\Services\Supports\Alert;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -17,7 +18,7 @@ class TrainingController extends Controller
     public function index(Request $request)
     {
 
-        $query = Training::with('category');
+        $query = Training::with('category')->orderBy('created_at', 'desc');
 
         // Filter berdasarkan kategori
         if ($request->filled('category_id')) {
@@ -60,69 +61,101 @@ class TrainingController extends Controller
 
     public function show(Training $training)
     {
-        $training->load('category'); // load relasi langsung
+        $user = Auth::guard('user')->user();
 
-        $sessionKey = 'viewed_training_' . $training->id;
+        $training->load('category'); // tidak perlu eager-load semua
 
-        if (!session()->has($sessionKey)) {
-            $training->increment('views');
-            session()->put($sessionKey, true);
+        $acceptedParticipants = TrainingUser::with('user')
+            ->where('training_id', $training->id)
+            ->where('status', 'LULUS')
+            ->paginate(10); // Sesuaikan jumlah per halaman
+
+        if (request()->ajax()) {
+            return response()->json([
+                'html' => view('public.training.participants', compact('acceptedParticipants'))->render()
+            ]);
         }
 
-        return view('public.training.show', [
-            'training' => $training,
-        ]);
+        return view('public.training.show', compact('training', 'user', 'acceptedParticipants'));
     }
 
-    public function register(Training $training)
+    public function register(Request $request, Training $training)
     {
-        $user = Auth::user();
+        $user = Auth::guard('user')->user();
 
-        // Cek apakah user sudah mendaftar
+        // Validasi file
+        $request->validate([
+            'letter_statement' => 'required|file|mimes:pdf|max:2048',
+            'letter_recommendation' => 'required|file|mimes:pdf|max:2048',
+            'komitmen_check' => 'required'
+        ]);
+
+        // Cek duplikat
         if (TrainingUser::where('user_id', $user->id)->where('training_id', $training->id)->exists()) {
             return back()->with(Alert::error('Anda sudah mendaftar pelatihan ini.'));
         }
 
-        $requiredFields = [
-            'date_of_birth',
-            'place_of_birth',
-            'phone',
-            'gender',
-            'province',
-            'city',
-            'district',
-            'village',
-            'job',
-            'education',
-            'education_institutions',
-            'religion',
-            'photo'
-        ];
+        // Simpan file
+        $statementPath = $request->file('letter_statement')->store('letters', 'public');
+        $recommendationPath = $request->file('letter_recommendation')->store('letters', 'public');
 
-        foreach ($requiredFields as $field) {
-            if (empty($user->{$field})) {
-                return response()->json([
-                    'incomplete_profile' => true,
-                    'redirect' => route('public.account.profile.index', ['tab' => 'data-diri-edit']),
-                ]);
-            }
-        }
-
-        $training_id_padded = str_pad($training->id, 8, '1', STR_PAD_LEFT); // 8 digit
-        $user_id_padded = str_pad($user->id, 4, '0', STR_PAD_LEFT);         // 4 digit
-
+        // Buat no registrasi
+        $training_id_padded = str_pad($training->id, 8, '1', STR_PAD_LEFT);
+        $user_id_padded = str_pad($user->id, 4, '0', STR_PAD_LEFT);
         $no_reg = 'UID-' . $training_id_padded . '-' . $user_id_padded;
 
-
-        // Simpan ke pivot table
+        // Simpan ke database
         TrainingUser::create([
             'user_id' => $user->id,
             'training_id' => $training->id,
-            'no_registrasi' => $no_reg,
+            'registration_number' => $no_reg,
             'status' => 'DAFTAR',
             'is_approved' => false,
+            'letter_statement' => $statementPath,
+            'letter_recommendation' => $recommendationPath,
         ]);
 
-        return back()->with('success', 'Berhasil mendaftar pelatihan.');
+        session(['success_access_training_id' => $training->id]);
+
+        return redirect()->route('public.training.success', ['training' => $training->id]);
+    }
+    public function destroy(TrainingUser $trainingUser)
+    {
+        // Hapus file surat pernyataan
+        if ($trainingUser->letter_statement && Storage::disk('public')->exists($trainingUser->letter_statement)) {
+            Storage::disk('public')->delete($trainingUser->letter_statement);
+        }
+
+        // Hapus file surat rekomendasi
+        if ($trainingUser->letter_recommendation && Storage::disk('public')->exists($trainingUser->letter_recommendation)) {
+            Storage::disk('public')->delete($trainingUser->letter_recommendation);
+        }
+
+        // Hapus data pendaftaran
+        $trainingUser->delete();
+
+        return back()->with(Alert::success('Berhasil membatalkan pendaftaran pelatihan.'));
+    }
+
+    public function success(Training $training)
+    {
+        $user = Auth::guard('user')->user();
+
+        // Cegah akses jika belum login atau session tidak sesuai
+        if (!$user || session('success_access_training_id') !== $training->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        // Tambahan: Cek apakah user benar-benar sudah mendaftar
+        if (!TrainingUser::where('user_id', $user->id)->where('training_id', $training->id)->exists()) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        // Hapus session agar tidak bisa akses ulang
+        session()->forget('success_access_training_id');
+
+        return view('public.training.success', [
+            'training' => $training,
+        ]);
     }
 }

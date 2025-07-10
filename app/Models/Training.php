@@ -20,7 +20,8 @@ class Training extends Model
         'status',
         'thumbnail_image',
         'description',
-        'target_audience'
+        'target_audience',
+        'photo',
     ];
     protected $casts = [
         'start_date' => 'date',
@@ -31,5 +32,10 @@ class Training extends Model
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function training_users()
+    {
+        return $this->hasMany(TrainingUser::class, 'training_id');
     }
 }

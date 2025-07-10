@@ -3,20 +3,30 @@
 namespace App\Http\Controllers\User\Account;
 
 use App\Http\Controllers\Controller;
+use App\Models\Training;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\TrainingUser;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, Training $training)
     {
-        // Ambil data user yang sedang login
         $user = $request->user();
 
-        // Kembalikan view dengan data user
+        // Ambil data pendaftaran pelatihan user yang statusnya "DAFTAR"
+        $trainingUser = $user->training_users()
+            ->with('training') // jika ingin akses data pelatihan terkait
+            ->where('status', 'DAFTAR')
+            ->get();
+
         return view('public.account.profile.index', [
             'user' => $user,
+            'trainingUser' => $trainingUser,
         ]);
     }
+
 
     public function update(Request $request)
     {

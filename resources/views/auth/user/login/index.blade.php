@@ -16,7 +16,7 @@
         <div
             class="position-relative overflow-hidden text-bg-light min-vh-100 d-flex align-items-center justify-content-center">
             <div class="d-flex align-items-center justify-content-center w-100 py-4">
-                <div class="card mb-0 w-100 shadow" style="max-width:1200px;">
+                <div class="card mb-0 w-100 shadow" style="max-width:1000px;">
                     <div class="row g-0 align-items-center">
                         <!-- KIRI: GAMBAR -->
                         <div class="col-md-6 d-none d-md-block">
@@ -26,8 +26,8 @@
                             </div>
                         </div>
                         <!-- KANAN: FORM -->
-                        <div class="col-md-6 col-lg-5 col-xxl-3">
-                            <div class="card-body mt-5">
+                        <div class="col-md-6 col-lg-5">
+                            <div class="card-body">
                                 @include('layouts.partials.alert')
                                 <a href="{{ route('auth.user.login.index') }}"
                                     class="text-nowrap logo-img text-center d-block py-3 w-100">

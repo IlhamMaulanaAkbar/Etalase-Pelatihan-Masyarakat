@@ -27,6 +27,9 @@
                                             <h6 class="fs-2 fw-semibold mb-0">Nama Video</h6>
                                         </th>
                                         <th>
+                                            <h6 class="fs-2 fw-semibold mb-0">Tipe Video</h6>
+                                        </th>
+                                        <th>
                                             <h6 class="fs-2 fw-semibold mb-0">Link Video</h6>
                                         </th>
                                         <th>
@@ -54,9 +57,14 @@
                                                 <p class="mb-0 fs-2 fw-normal">{{ $learning->video_name }}</p>
                                             </td>
                                             <td>
+                                                <p class="mb-0 fs-2 fw-normal">{{ ucfirst(strtolower($learning->type)) }}
+                                                </p>
+                                            </td>
+                                            <td>
                                                 <a href="{{ $learning->video_url }}" target="_blank"
                                                     class="text-decoration-none text-primary">{{ $learning->video_url }}</a>
                                             </td>
+
                                             <td>
                                                 <p class="mb-0 fs-2 fw-normal">{{ $learning->uploaded_at->format('d M Y') }}
                                                 </p>

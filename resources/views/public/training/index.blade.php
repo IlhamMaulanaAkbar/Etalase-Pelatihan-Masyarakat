@@ -13,7 +13,7 @@
                         <label class="form-label">Pilih Pelatihan</label>
                         <select name="category_id" class="form-select border-2" onchange="this.form.submit()">
                             <option value="" @selected(request('category_id') == '')>Semua Pelatihan</option>
-                            <option value="1" @selected(request('category_id') == '1')>Pelatihan Pengelolaan BUMDesa</option>
+                            <option value="1" @selected(request('category_id') == '1')>Pengelolaan BUMDesa</option>
                             <option value="2" @selected(request('category_id') == '2')>Kader Pemberdayaan Masyarakat Desa</option>
                             <option value="3" @selected(request('category_id') == '3')>Pemberdayaan Masyarakat Hukum Adat</option>
                             <option value="4" @selected(request('category_id') == '4')>Pembangunan Desa Wisata</option>

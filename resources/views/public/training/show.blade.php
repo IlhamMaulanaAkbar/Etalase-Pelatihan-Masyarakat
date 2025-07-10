@@ -1,3 +1,34 @@
+@php
+    $isRegistered = $training->training_users->where('user_id', $user?->id)->first();
+    $kuotaPenuh = $training->training_users->count() >= $training->target_audience;
+    $now = now();
+
+    $profilLengkap =
+        $user &&
+        collect([
+            'date_of_birth',
+            'place_of_birth',
+            'phone',
+            'gender',
+            'province',
+            'city',
+            'district',
+            'village',
+            'job',
+            'education',
+            'education_institutions',
+            'religion',
+        ])->every(fn($field) => !empty($user->{$field}));
+
+    $statusClass = match ($training->status) {
+        'BUKA' => 'success',
+        'SELESAI' => 'primary',
+        'TUTUP' => 'danger',
+    };
+@endphp
+
+
+
 @extends('layouts.base-public')
 
 @section('content')
@@ -88,10 +119,7 @@
                                     </div>
                                 </div>
                             </div>
-
-
                             <hr>
-
                             <h5 class="fw-bold">Deskripsi</h5>
                             <p>{!! $training->description !!}</p>
                         </div>
@@ -101,9 +129,90 @@
                         </div>
 
                         <div class="tab-pane fade" id="peserta" role="tabpanel">
-                            <p>Data peserta akan ditampilkan di sini.</p>
+                            <div id="participants-wrapper">
+                                @include('public.training.participants', [
+                                    'acceptedParticipants' => $acceptedParticipants,
+                                ])
+                            </div>
                         </div>
                     </div>
+                    {{-- Form Pendaftaran & Komitmen --}}
+                    <!-- FORM PEMBUKA -->
+                    <div id="form-pendaftaran-wrapper" class="d-none">
+                        <!-- Step 1: Upload Surat -->
+                        <div id="formPendaftaranSection" class="bg-light p-4 rounded">
+                            <div class="alert alert-primary border border-primary" role="alert">
+                                <strong>Perhatian</strong><br>
+                                Setelah melengkapi form pendaftaran, kamu akan diarahkan untuk mengerjakan <strong>Test
+                                    Asesmen</strong>.
+                            </div>
+                            <h4 class="fw-semibold mb-0">Form Pendaftaran Pelatihan</h4>
+                            <p>Mohon lengkapi form berikut dengan benar sebagai persyaratan untuk dapat mengikuti pelatihan.
+                            </p>
+
+                            <form id="formPendaftaran" method="POST"
+                                action="{{ route('public.training.register', $training) }}" enctype="multipart/form-data">
+                                @csrf
+
+                                <div class="mb-3">
+                                    <label class="form-label">Surat Rekomendasi Kepala Desa</label>
+                                    <input type="file" name="letter_recommendation" class="form-control bg-white"
+                                        required accept="application/pdf" value="{{ old('letter_recommendation') }}">
+                                    <small class="fst-italic fs-1">*File harus format .PDF | Max 2MB</small>
+                                    <div id="errorRecommendation" class="text-danger mt-1 d-none">
+                                        Mohon untuk upload surat rekomendasi terlebih dahulu.
+                                    </div>
+                                    <div id="errorRecommendationFormat" class="text-danger mt-1 d-none">
+                                        File harus berupa PDF.
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Surat Pernyataan</label>
+                                    <input type="file" name="letter_statement" class="form-control bg-white" required
+                                        accept="application/pdf" value="{{ old('letter_statement') }}">
+                                    <small class="fst-italic fs-1">*File harus format .PDF | Max 2MB</small>
+                                    <div id="errorStatement" class="text-danger mt-1 d-none">
+                                        Mohon untuk upload surat pernyataan terlebih dahulu.
+                                    </div>
+                                    <div id="errorStatementFormat" class="text-danger mt-1 d-none">
+                                        File harus berupa PDF.
+                                    </div>
+                                </div>
+
+                                <!-- Hidden field untuk komitmen -->
+                                <input type="hidden" name="komitmen_check" id="hiddenKomitmen">
+
+                                <button type="button" class="btn btn-primary w-100 rounded-pill" id="btnLanjutForm">
+                                    Selanjutnya
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Step 2: Komitmen -->
+                        <div id="form-komitmen" class="d-none bg-light p-4 rounded">
+                            <h4 class="fw-semibold mb-0">Form Komitmen</h4>
+                            <p>Saya akan berkomitmen mengikuti pelatihan ini.</p>
+
+                            <div class="form-check mb-3">
+                                <input type="checkbox" class="form-check-input" id="komitmenCheck">
+                                <label class="form-check-label" for="komitmenCheck">
+                                    Saya telah bersedia mengikuti persyaratan yang ada pada form komitmen pelatihan ini.
+                                </label>
+                                <div id="komitmenError" class="text-danger mt-1 d-none">
+                                    Anda harus menyetujui komitmen ini untuk dapat melanjutkan.
+                                </div>
+
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary w-100 rounded-pill"
+                                    id="btnSebelumnya">Sebelumnya</button>
+                                <button class="btn btn-primary w-100 rounded-pill" id="btnSubmitForm">Submit
+                                    Pendaftaran</button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 {{-- Sidebar --}}
@@ -114,16 +223,68 @@
                                 <div class="fw-semibold d-block">Batas Pendaftaran</div>
                                 <h5 class="fw-bolder text-black">{{ $training->deadline_date->format('d M Y') }}</h5>
                             </div>
-                            <span class="badge bg-success rounded-pill px-4 py-2 fs-2">{{ $training->status }}</span>
+                            <span class="badge bg-{{ $statusClass }} rounded-pill px-4 py-2 fs-2">
+                                {{ ucfirst(strtolower($training->status)) }}
+                            </span>
                         </div>
                         <div class="mt-2">
-                            <form method="POST" action="">
-                                @csrf
-                                <button type="submit" class="btn btn-primary w-100 rounded-pill fw-semibold py-2 fs-5">
-                                    Daftar
-                                </button>
-                            </form>
+                            {{-- Jika belum login --}}
+                            @guest('user')
+                                <a href="{{ route('auth.user.login.index') }}"
+                                    class="btn btn-danger w-100 rounded-pill fw-bold py-2">
+                                    Profil Anda Belum Lengkap
+                                </a>
+                                @elseauth('user')
+                                {{-- Cek status pelatihan --}}
+                                @if ($training->status === 'SELESAI')
+                                    <button class="btn btn-secondary w-100 rounded-pill fw-bold py-2" disabled>
+                                        Pelatihan Telah Selesai
+                                    </button>
+                                @elseif ($kuotaPenuh || $training->status === 'TUTUP' || $now->gt($training->deadline_date))
+                                    <button class="btn btn-danger w-100 rounded-pill fw-bold py-2" disabled>
+                                        TUTUP
+                                    </button>
+                                @elseif (!$user)
+                                    <button class="btn btn-danger w-100 rounded-pill fw-bold py-2">
+                                        Profil Anda Belum Lengkap
+                                    </button>
+                                @elseif (!$profilLengkap)
+                                    {{-- Jika user login tapi profil belum lengkap --}}
+                                    <button id="btnLengkapiProfil" type="button"
+                                        class="btn btn-danger w-100 rounded-pill fw-bold py-2">
+                                        Profil Anda Belum Lengkap
+                                    </button>
+                                @elseif (!$isRegistered)
+                                    {{-- Jika user bisa daftar --}}
+                                    <button type="button" id="btnDaftarAjax"
+                                        class="btn btn-primary w-100 rounded-pill fw-bold py-2">
+                                        Daftar
+                                    </button>
+                                @else
+                                    {{-- Status setelah daftar --}}
+                                    @switch($isRegistered->status)
+                                        @case('DAFTAR')
+                                            <button class="btn btn-primary w-100 rounded-pill fw-bold py-2" disabled>
+                                                Anda Sudah Terdaftar
+                                            </button>
+                                        @break
+
+                                        @case('LULUS')
+                                            <button class="btn btn-success w-100 rounded-pill fw-bold py-2" disabled>
+                                                Anda Diterima
+                                            </button>
+                                        @break
+
+                                        @case('TIDAK_LULUS')
+                                            <button class="btn btn-danger w-100 rounded-pill fw-bold py-2" disabled>
+                                                Anda Tidak Diterima
+                                            </button>
+                                        @break
+                                    @endswitch
+                                @endif
+                            @endauth
                         </div>
+
                         <hr>
                         <div class="p-3 mt-3">
                             <ul class="list-unstyled">
@@ -209,9 +370,203 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modalKonfirmasiDaftar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 p-4 text-center">
+                <h4 class="fw-semibold">Konfirmasi</h4>
+                <p class="mb-4 fw-normal">Apakah seluruh isian data pendaftaran telah benar?<br>
+                    Data yang telah disubmit tidak dapat diubah kembali
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="button" class="btn btn-outline-primary rounded-pill px-4 w-100"
+                        data-bs-dismiss="modal">Batal</button>
+                    <button type="button" id="btnKonfirmasiSubmit"
+                        class="btn btn-primary rounded-pill px-4 w-100">Daftar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @push('scripts')
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formSection = document.getElementById('formPendaftaranSection');
+            const formWrapper = document.getElementById('form-pendaftaran-wrapper');
+            const formKomitmen = document.getElementById('form-komitmen');
+            const formElement = document.getElementById('formPendaftaran');
+            const btnLanjut = document.getElementById('btnLanjutForm');
+            const btnSebelumnya = document.getElementById('btnSebelumnya');
+            const btnSubmit = document.getElementById('btnSubmitForm');
+            const komitmenCheck = document.getElementById('komitmenCheck');
+            const hiddenKomitmen = document.getElementById('hiddenKomitmen');
+
+            // Menampilkan form pendaftaran dari tombol di luar (misal: #btnDaftarAjax)
+            document.getElementById('btnDaftarAjax')?.addEventListener('click', function() {
+                document.getElementById('detailTabs').classList.add('d-none');
+                document.getElementById('detailTabsContent').classList.add('d-none');
+                formWrapper.classList.remove('d-none');
+                window.scrollTo({
+                    top: formWrapper.offsetTop - 100,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Navigasi ke form komitmen
+            btnLanjut?.addEventListener('click', function() {
+                const statement = formElement.querySelector('input[name="letter_statement"]');
+                const recommendation = formElement.querySelector('input[name="letter_recommendation"]');
+                const formSection = document.getElementById('formPendaftaranSection');
+                const formKomitmen = document.getElementById('form-komitmen');
+
+                // Error messages
+                const errorStatement = document.getElementById('errorStatement');
+                const errorStatementFormat = document.getElementById('errorStatementFormat');
+                const errorRecommendation = document.getElementById('errorRecommendation');
+                const errorRecommendationFormat = document.getElementById('errorRecommendationFormat');
+
+                let isValid = true;
+
+                // ===== Validasi Surat Pernyataan =====
+                if (!statement.files.length) {
+                    errorStatement.classList.remove('d-none');
+                    isValid = false;
+                } else {
+                    errorStatement.classList.add('d-none');
+
+                    const file = statement.files[0];
+                    if (file.type !== 'application/pdf') {
+                        errorStatementFormat.classList.remove('d-none');
+                        isValid = false;
+                    } else {
+                        errorStatementFormat.classList.add('d-none');
+                    }
+                }
+
+                // ===== Validasi Surat Rekomendasi =====
+                if (!recommendation.files.length) {
+                    errorRecommendation.classList.remove('d-none');
+                    isValid = false;
+                } else {
+                    errorRecommendation.classList.add('d-none');
+
+                    const file = recommendation.files[0];
+                    if (file.type !== 'application/pdf') {
+                        errorRecommendationFormat.classList.remove('d-none');
+                        isValid = false;
+                    } else {
+                        errorRecommendationFormat.classList.add('d-none');
+                    }
+                }
+
+                // ===== Tampilkan form komitmen jika valid =====
+                if (isValid) {
+                    formSection.classList.add('d-none');
+                    formKomitmen.classList.remove('d-none');
+                }
+            });
+            // Kembali ke form pendaftaran
+            btnSebelumnya?.addEventListener('click', function() {
+                formKomitmen.classList.add('d-none');
+                formSection.classList.remove('d-none');
+            });
+
+            // Submit akhir form
+            btnSubmit?.addEventListener('click', function() {
+                const errorMsg = document.getElementById('komitmenError');
+
+                if (!komitmenCheck.checked) {
+                    errorMsg.classList.remove('d-none');
+                    komitmenCheck.focus();
+                    return;
+                }
+
+                errorMsg.classList.add('d-none');
+
+                // Tampilkan modal konfirmasi
+                const modal = new bootstrap.Modal(document.getElementById('modalKonfirmasiDaftar'));
+                modal.show();
+            });
+
+            // Submit form saat user menyetujui dari modal
+            document.getElementById('btnKonfirmasiSubmit')?.addEventListener('click', function() {
+                hiddenKomitmen.value = "1";
+                formElement.submit();
+            });
+
+
+            komitmenCheck?.addEventListener('change', function() {
+                const errorMsg = document.getElementById('komitmenError');
+                if (this.checked) {
+                    errorMsg.classList.add('d-none');
+                }
+            });
+            statement?.addEventListener('change', () => {
+                if (statement.files.length && statement.files[0].type === 'application/pdf') {
+                    errorStatement.classList.add('d-none');
+                    errorStatementFormat.classList.add('d-none');
+                }
+            });
+
+            recommendation?.addEventListener('change', () => {
+                if (recommendation.files.length && recommendation.files[0].type === 'application/pdf') {
+                    errorRecommendation.classList.add('d-none');
+                    errorRecommendationFormat.classList.add('d-none');
+                }
+            });
+
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const rowsPerPage = document.getElementById("rowsPerPage");
+            rowsPerPage?.addEventListener("change", function() {
+                const perPage = this.value;
+                const url = new URL(window.location.href);
+                url.searchParams.set('per_page', perPage);
+                url.searchParams.set('page', 1); // reset ke page 1
+                fetchParticipants(url);
+            });
+
+            document.addEventListener("click", function(e) {
+                const link = e.target.closest(".pagination-link");
+                if (link) {
+                    e.preventDefault();
+                    fetchParticipants(link.href);
+                }
+            });
+
+            function fetchParticipants(url) {
+                fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    }).then(res => res.json())
+                    .then(data => {
+                        document.querySelector("#participants-wrapper").innerHTML = data.html;
+                    });
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            document.addEventListener("click", function(e) {
+                const link = e.target.closest('.pagination a');
+                if (link) {
+                    e.preventDefault();
+                    const url = link.href;
+                    fetchParticipants(url);
+                }
+            });
+
+            function fetchParticipants(url) {
+                fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        document.querySelector("#participants-wrapper").innerHTML = data.html;
+                    })
+                    .catch(err => console.error("Gagal load data:", err));
+            }
+        });
         document.addEventListener("DOMContentLoaded", function() {
             const modal = document.getElementById("shareModal");
             const shareInput = document.getElementById("shareLink");
@@ -222,7 +577,7 @@
             modal.addEventListener('show.bs.modal', function(e) {
                 const button = e.relatedTarget;
                 const id = button.getAttribute("data-id");
-                const baseUrl = "{{ url('/pelatihan') }}";
+                const baseUrl = "{{ url('/training') }}";
                 const shareUrl = `${baseUrl}/${id}`;
                 shareInput.value = shareUrl;
                 fbShare.href =

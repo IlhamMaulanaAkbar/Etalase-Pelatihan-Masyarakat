@@ -15,6 +15,7 @@ class Learning extends Model
         'video_name',
         'video_url',
         'uploaded_at',
+        'type',
     ];
 
     protected $casts = [

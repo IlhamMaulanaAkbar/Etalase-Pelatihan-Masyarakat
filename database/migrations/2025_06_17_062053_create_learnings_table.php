@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('learnings', function (Blueprint $table) {
             $table->id();
             $table->string('video_name', 255);
-            $table->string('video_url', 255); 
+            $table->string('video_url', 255);
             $table->date('uploaded_at')->useCurrent()->useCurrentOnUpdate();
+            $table->unsignedInteger('views')->default(0);
+            $table->enum('type', ['umum', 'pelatihan', 'pendampingan', 'pengumuman'])->default('umum');
             $table->timestamps();
         });
     }

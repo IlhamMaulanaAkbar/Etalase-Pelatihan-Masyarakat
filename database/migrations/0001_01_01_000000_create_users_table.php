@@ -33,6 +33,7 @@ return new class extends Migration
             $table->string('education', 255)->nullable();
             $table->string('education_institutions', 255)->nullable();
             $table->string('religion', 128)->nullable();
+            $table->string('photo')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

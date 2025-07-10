@@ -5,8 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login</title>
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/favicon.png" />
-    <link rel="stylesheet" href="../assets/css/styles.css" />
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/logos/logo.png') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/styles.min.css') }}" />
 </head>
 
 <body>
@@ -21,8 +21,8 @@
                         @include('layouts.partials.alert')
                         <div class="card mb-0">
                             <div class="card-body">
-                                <a href="./index.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
-                                    <img src="../assets/images/logos/dark-logo.svg" alt="" w="30" h="30">
+                                <a href="{{ route('auth.internal.login.index') }}" class="text-nowrap logo-img text-center d-block py-3 w-100">
+                                    <img src="{{ asset('assets/images/logos/logo.png') }}" alt="logo" width="50" height="50">
                                 </a>
                                 <p class="text-center">Etalase Pelatihan Masyarakat</p>
                                 <form action="{{ route('auth.internal.login.store') }}" method="POST">

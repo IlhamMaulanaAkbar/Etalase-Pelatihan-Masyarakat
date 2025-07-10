@@ -21,6 +21,13 @@ class LoginController extends Controller
         $data = $request->only('email', 'password');
 
         if (Auth::guard('internal')->attempt($data)) {
+
+            if (auth('internal')->user()->role !== 'internal') {
+                Auth::guard('internal')->logout(); // logout langsung
+                Alert::error('Anda tidak memiliki akses.');
+                return back();
+            }
+
             $request->session()->regenerate();
             Alert::success('Selamat datang, ' . auth('internal')->user()->name . '.');
             return redirect()->intended(route('internal.home.dashboard.index', absolute: false));

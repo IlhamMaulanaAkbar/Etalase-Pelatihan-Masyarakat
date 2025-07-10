@@ -14,25 +14,26 @@ class TrainingUser extends Model
     protected $fillable = [
         'user_id',
         'training_id',
-        'no_registrasi',
+        'registration_number',
         'status',
+        'letter_statement',
+        'letter_recommendation',
         'is_approved',
         'verified_at',
     ];
 
+    protected $casts = [
+        'verified_at' => 'datetime',
+    ];
+
     // User.php
-    public function trainings()
+    public function training()
     {
-        return $this->belongsToMany(Training::class, 'training_users')
-            ->withPivot('status', 'is_approved', 'verified_at', 'no_registrasi')
-            ->withTimestamps();
+        return $this->belongsTo(Training::class, 'training_id');
     }
 
-    // Training.php
-    public function users()
+    public function user()
     {
-        return $this->belongsToMany(User::class, 'training_users')
-            ->withPivot('status', 'is_approved', 'verified_at', 'no_registrasi')
-            ->withTimestamps();
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

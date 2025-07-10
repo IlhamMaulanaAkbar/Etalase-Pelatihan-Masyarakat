@@ -32,4 +32,6 @@ Route::middleware(['auth:user'])->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('auth.user.logout.destroy');
     Route::get('/profile', [ProfileController::class, 'index'])->name('public.account.profile.index');
     Route::put('/profile', [ProfileController::class, 'update'])->name('public.account.profile.update');
+    Route::post('/training/{training}/register', [TrainingController::class, 'register'])->name('public.training.register');
+    Route::get('/training/{training}/success', [TrainingController::class, 'success'])->name('public.training.success');
 });

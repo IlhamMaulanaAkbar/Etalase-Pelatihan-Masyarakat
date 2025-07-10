@@ -12,21 +12,39 @@ class LearningController extends Controller
 {
     public function index()
     {
-        $learnings = Learning::paginate(9);
         $youtube = new Youtube();
 
-        foreach ($learnings as $learning) {
-            $learning->thumbnail = $youtube->getThumbnail($learning->video_url);
-            $learning->video_url = $youtube->getEmbedUrl($learning->video_url);
+        // Default: hanya tampilkan umum & pengumuman
+        $learnings = Learning::whereIn('type', ['umum', 'pengumuman'])->latest()->paginate(9);
+
+        // Kategori per-type
+        $umum = Learning::where('type', 'umum')->latest()->get();
+        $pengumuman = Learning::where('type', 'pengumuman')->latest()->get();
+
+        $pelatihan = collect();
+        $pendampingan = collect();
+
+        if (auth('user')->check()) {
+            // Tambahkan jika login
+            $learnings = Learning::latest()->paginate(9);
+            $pelatihan = Learning::where('type', 'pelatihan')->latest()->get();
+            $pendampingan = Learning::where('type', 'pendampingan')->latest()->get();
         }
-        // dd($learnings);
+
+        // Generate thumbnail dan embed URL untuk semua
+        foreach ([$learnings, $umum, $pengumuman, $pelatihan, $pendampingan] as $collection) {
+            foreach ($collection as $item) {
+                $item->thumbnail = $youtube->getThumbnail($item->video_url);
+                $item->video_url = $youtube->getEmbedUrl($item->video_url);
+            }
+        }
 
         return view('public.learning.index', [
             'learnings' => $learnings,
-            'youtube' => $youtube,
-            'embedUrl' => $youtube->getEmbedUrl($learning->video_url),
-            'videoId' => $youtube->getVideoId($learning->video_url),
-            'thumbnail' => $youtube->getThumbnail($learning->video_url),
+            'umum' => $umum,
+            'pengumuman' => $pengumuman,
+            'pelatihan' => $pelatihan,
+            'pendampingan' => $pendampingan
         ]);
     }
 }

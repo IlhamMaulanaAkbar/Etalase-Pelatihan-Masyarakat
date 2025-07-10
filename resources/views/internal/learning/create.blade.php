@@ -33,6 +33,22 @@
                                     @enderror
                                 </div>
                                 <div class="mb-3">
+                                    <label for="type" class="form-label">Tipe Video</label>
+                                    <select class="form-select" id="type" name="type">
+                                        <option value="">-- Pilih Tipe --</option>
+                                        <option value="umum" {{ old('type') == 'umum' ? 'selected' : '' }}>Umum</option>
+                                        <option value="pelatihan" {{ old('type') == 'pelatihan' ? 'selected' : '' }}>
+                                            Pelatihan</option>
+                                        <option value="pendampingan" {{ old('type') == 'pendampingan' ? 'selected' : '' }}>
+                                            Pendampingan</option>
+                                        <option value="pengumuman" {{ old('type') == 'pengumuman' ? 'selected' : '' }}>
+                                            Pengumuman</option>
+                                    </select>
+                                    @error('type')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
                                     <label for="video_url" class="form-label">Link Video Youtube</label>
                                     <input type="url" class="form-control" id="video_url" name="video_url"
                                         value="{{ old('video_url') }}">

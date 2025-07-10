@@ -38,7 +38,27 @@
                             </ul>
                         </div>
                         <!-- Tombol Kembali di kanan -->
-                        <a href="{{ route('internal.training.index') }}" class="btn btn-outline-primary">Tambah Evaluasi</a>
+                        <div class="d-flex flex-wrap gap-6">
+                            <!-- Example single danger button -->
+                            <div class="btn-group">
+                                <button type="button"
+                                    class="btn btn-success dropdown-toggle text-white d-flex align-items-center"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="ti ti-square-plus fs-4 me-2"></i>Tambah
+                                </button>
+                                <ul class="dropdown-menu animated flipInX">
+                                    <li>
+                                        <a class="dropdown-item"
+                                            href="{{ route('internal.test-assessment.pre-test.index', ['training' => $training->id]) }}">Pre Test</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{route('internal.test-assessment.post-test.index', ['training' => $training->id])}}">Post Test</a>
+                                    </li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)">Evaluasi Pelatihan</a></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)">Evaluasi Instruktur</a></li>
+                                </ul>
+                            </div>
+                        </div>
                         <a href="{{ route('internal.training.index') }}" class="btn btn-primary">Kembali</a>
                     </div>
 

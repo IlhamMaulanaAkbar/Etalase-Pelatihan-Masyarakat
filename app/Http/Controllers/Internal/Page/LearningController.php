@@ -34,12 +34,14 @@ class LearningController extends Controller
             'video_name' => 'required|string|max:255',
             'video_url' => 'required|string|max:255',
             'uploaded_at' => 'required|date',
+            'type' => 'required|in:umum,pelatihan,pendampingan,pengumuman',
         ]);
 
         $learning = new Learning();
         $learning->video_name = $request->video_name;
         $learning->video_url = $request->video_url;
         $learning->uploaded_at = $request->uploaded_at;
+        $learning->type = $request->type;
         $learning->save();
         if ($learning->save()) {
             Alert::success('Video berhasil disimpan.');
@@ -75,21 +77,21 @@ class LearningController extends Controller
             'video_name' => 'required|string|max:255',
             'video_url' => 'required|string|max:255',
             'uploaded_at' => 'required|date',
+            'type' => 'required|in:umum,pelatihan,pendampingan,pengumuman',
         ]);
 
         $learning->update([
             'video_name' => $request->video_name,
             'video_url' => $request->video_url,
             'uploaded_at' => $request->uploaded_at,
+            'type' => $request->type,
         ]);
         if ($learning->save()) {
             Alert::success('Video berhasil diperbarui.');
         } else {
             Alert::error('Gagal memperbarui video.');
         }
-        return redirect()->route('internal.learning.index', [
-            'learning' => $learning,
-        ]);
+        return redirect()->intended(route('internal.learning.index'));
     }
 
     public function destroy(Learning $learning)

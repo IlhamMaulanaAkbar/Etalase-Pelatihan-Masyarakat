@@ -43,9 +43,9 @@
 
                     <div class="card d-flex flex-column flex-md-row align-items-start gap-3 p-3">
                         <!-- Embed video (ganti thumbnail) -->
-                        <div class="me-4">
+                        <div class="me-4 w-100 d-flex justify-content-center ">
                             <iframe src="{{ $embedUrl }}" class="w-100"
-                                style="max-width: 400px; height: 170px; border-radius: 8px;" title="YouTube video player"
+                                style="max-width: 400px; height: 235px; border-radius: 8px;" title="YouTube video player"
                                 frameborder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                 allowfullscreen>
@@ -56,10 +56,10 @@
                         <div class="w-100">
                             <p class="mb-1 fw-semibold text-muted">Nama Video</p>
                             <h6 class="fw-bolder fs-5">{{ $learning->video_name }}</h6>
-
                             <p class="mt-3 mb-1 fw-semibold text-muted">Tanggal Upload</p>
                             <p class="fw-bolder">{{ $learning->uploaded_at->format('d F Y') }}</p>
-
+                            <p class="mt-3 mb-1 fw-semibold text-muted">Tipe Video</p>
+                            <p class="fw-bolder">{{ ucfirst(strtolower($learning->type)) }}</p>
                             <p class="mt-3 mb-1 fw-semibold text-muted">Link YouTube</p>
                             <a href="{{ $learning->video_url }}" class="text-decoration-none text-primary fw-semibold"
                                 target="_blank">

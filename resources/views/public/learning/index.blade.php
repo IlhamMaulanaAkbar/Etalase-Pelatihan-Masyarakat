@@ -13,72 +13,107 @@
     <section class="py-4">
         <div class="container">
             <ul class="nav nav-pills gap-2" id="video-tab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#all"
-                        type="button" role="tab">All</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="event-tab" data-bs-toggle="pill" data-bs-target="#event" type="button"
-                        role="tab">Kegiatan</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="open-tab" data-bs-toggle="pill" data-bs-target="#open" type="button"
-                        role="tab">Pelatihan</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="announce-tab" data-bs-toggle="pill" data-bs-target="#announce"
-                        type="button" role="tab">Pendampingan</button>
-                </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#all"
+                            type="button" role="tab">All</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="event-tab" data-bs-toggle="pill" data-bs-target="#event" type="button"
+                            role="tab">Kegiatan</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="announce-tab" data-bs-toggle="pill" data-bs-target="#announce"
+                            type="button" role="tab">Pengumuman</button>
+                    </li>
+                    @auth('user')
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pelatihan-tab" data-bs-toggle="pill" data-bs-target="#trainings"
+                                type="button" role="tab">Pelatihan</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pendampingan-tab" data-bs-toggle="pill" data-bs-target="#learnings"
+                                type="button" role="tab">Pendampingan</button>
+                        </li>
+                    @endauth
             </ul>
             <hr class="mb-4">
 
             {{-- Tab Content --}}
             <div class="tab-content" id="video-tabContent">
                 {{-- All Videos --}}
-                <div class="tab-pane fade show active" id="all" role="tabpanel">
-                    <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-                        @foreach ($learnings as $learning)
-                            <div class="col">
-                                <div class="h-100 border-0 rounded overflow-hidden">
-                                    <button type="button" class="p-0 border-0 bg-transparent w-100" data-bs-toggle="modal"
-                                        data-bs-target="#videoModal" data-video-url="{{ $learning->video_url }}">
-                                        <div class="position-relative overflow-hidden rounded-top"
-                                            style="aspect-ratio: 16 / 9;">
-                                            <img src="{{ $learning->thumbnail }}" alt="Thumbnail Video"
-                                                class="img-fluid w-100 h-100 object-fit-cover rounded" style="cursor: pointer;">
-                                            
-                                        </div>
-                                    </button>
+                <div class="tab-content" id="video-tabContent">
+                    <div class="tab-pane fade show active" id="all" role="tabpanel">
+                        <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+                            @foreach ($learnings as $learning)
+                                <div class="col">
+                                    <div class="h-100 border-0 rounded overflow-hidden">
+                                        <button type="button" class="p-0 border-0 bg-transparent w-100"
+                                            data-bs-toggle="modal" data-bs-target="#videoModal"
+                                            data-video-url="{{ $learning->video_url }}">
+                                            <div class="position-relative overflow-hidden rounded-top"
+                                                style="aspect-ratio: 16 / 9;">
+                                                <img src="{{ $learning->thumbnail }}" alt="Thumbnail Video"
+                                                    class="img-fluid w-100 h-100 object-fit-cover rounded"
+                                                    style="cursor: pointer;">
 
-                                    <div class="py-3 px-3">
-                                        <h6 class="fw-semibold mb-1 text-black">{{ $learning->video_name }}</h6>
-                                        <div class="d-flex text-muted small gap-3 mt-">
-                                            <div>
-                                                <i class="ti ti-calendar-event me-1"></i>
-                                                {{ $learning->uploaded_at->format('d F Y') }}
                                             </div>
-                                            <div>
-                                                <i class="ti ti-eye me-1"></i>
-                                                {{ $learning->views }}0 views
+                                        </button>
+
+                                        <div class="py-3 px-3">
+                                            <h6 class="fw-semibold mb-1 text-black">{{ $learning->video_name }}</h6>
+                                            <div class="d-flex text-muted small gap-3 mt-">
+                                                <div>
+                                                    <i class="ti ti-calendar-event me-1"></i>
+                                                    {{ $learning->uploaded_at->format('d F Y') }}
+                                                </div>
+                                                <div>
+                                                    <i class="ti ti-eye me-1"></i>
+                                                    {{ $learning->views }} Views
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="event" role="tabpanel">
+                    <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+                        @foreach ($umum as $item)
+                            @include('public.learning.video-card', ['video' => $item])
                         @endforeach
                     </div>
                 </div>
 
-                {{-- Other Tabs --}}
-                <div class="tab-pane fade" id="event" role="tabpanel">
-                    <p class="text-muted">Video kategori Event akan ditampilkan di sini.</p>
-                </div>
-                <div class="tab-pane fade" id="open" role="tabpanel">
-                    <p class="text-muted">Video kategori Pembukaan akan ditampilkan di sini.</p>
-                </div>
+                {{-- Tab Pengumuman --}}
                 <div class="tab-pane fade" id="announce" role="tabpanel">
-                    <p class="text-muted">Video kategori Pengumuman akan ditampilkan di sini.</p>
+                    <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+                        @foreach ($pengumuman as $item)
+                            @include('public.learning.video-card', ['video' => $item])
+                        @endforeach
+                    </div>
                 </div>
+
+                {{-- Tab Pelatihan --}}
+                @auth('user')
+                    <div class="tab-pane fade" id="trainings" role="tabpanel">
+                        <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+                            @foreach ($pelatihan as $item)
+                                @include('public.learning.video-card', ['video' => $item])
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Tab Pendampingan --}}
+                    <div class="tab-pane fade" id="learnings" role="tabpanel">
+                        <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+                            @foreach ($pendampingan as $item)
+                                @include('public.learning.video-card', ['video' => $item])
+                            @endforeach
+                        </div>
+                    </div>
+                @endauth
             </div>
         </div>
     </section>

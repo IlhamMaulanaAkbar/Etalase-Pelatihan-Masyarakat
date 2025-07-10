@@ -53,7 +53,7 @@
                         </div>
                     @else
                         <div class="alert alert-info mb-0">
-                            Belum ada petugas yang terdaftar.
+                            Belum ada pengguna yang terdaftar.
                         </div>
                     @endif
                 </div>

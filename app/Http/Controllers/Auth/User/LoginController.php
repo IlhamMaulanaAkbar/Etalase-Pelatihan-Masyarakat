@@ -20,9 +20,16 @@ class LoginController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->only('email', 'password');
+        $credentials = $request->only('email', 'password');
 
-        if (Auth::guard('user')->attempt($data)) {
+        if (Auth::guard('user')->attempt($credentials)) {
+            // Cek role setelah login berhasil
+            if (auth('user')->user()->role !== 'user') {
+                Auth::guard('user')->logout(); // logout langsung
+                Alert::error('Anda tidak memiliki akses.');
+                return back();
+            }
+
             $request->session()->regenerate();
             Alert::success('Selamat datang, ' . auth('user')->user()->name . '.');
             return redirect()->intended(route('public.home.dashboard.index', absolute: false));
@@ -31,6 +38,7 @@ class LoginController extends Controller
             return back();
         }
     }
+
 
 
     public function oAuthRedirect($provider)

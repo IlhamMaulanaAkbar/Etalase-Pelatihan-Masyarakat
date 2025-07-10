@@ -17,10 +17,12 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class, 'user_id')->constrained('users')->onDelete('cascade');
             $table->foreignIdFor(Training::class, 'training_id')->constrained('trainings')->onDelete('cascade');
-            $table->string('no_registrasi')->unique()->nullable();
+            $table->string('registration_number')->unique()->nullable();
             // Status partisipasi
-            $table->enum('status', ['DAFTAR', 'LULUS', 'TIDAK_LULUS', 'BATAL', 'DITOLAK'])->default('DAFTAR');
+            $table->enum('status', ['DAFTAR', 'LULUS', 'TIDAK_LULUS', 'BATAL'])->default('DAFTAR');
             $table->boolean('is_approved')->default(false);
+            $table->string('letter_recommendation')->nullable();
+            $table->string('letter_statement')->nullable();
             $table->timestamp('verified_at')->nullable();
             $table->timestamps();
         });

@@ -1,7 +1,7 @@
 @extends('layouts.base-public')
 
 @section('content')
-    <section class="bg-light py-5">
+    <section class="bg-light py-lg-5">
         <div class="container">
             <div class="row align-items-start ">
                 <!-- Sidebar -->
@@ -31,6 +31,11 @@
                         <li class="nav-item mb-1">
                             <button class="nav-link text-black-50 fw-semibold tab-link" data-target="pendampingan">
                                 <i class="ti ti-chalkboard me-1"></i>Pendampingan
+                            </button>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <button class="nav-link text-black-50 fw-semibold tab-link " data-target="test-asesmen">
+                                <i class="ti ti-book me-1"></i>Test Asesmen
                             </button>
                         </li>
                         <li class="nav-item mb-1">
@@ -80,7 +85,7 @@
                         <div id="dashboard" class="tab-content">
                             <div class="row g-3 mb-4 mt-4">
                                 <div class="col-md-4">
-                                    <div class="card shadow-sm border-0">
+                                    <div class="card shadow-sm border">
                                         <div
                                             class="card-body d-flex justify-content-between align-items-center social-user">
                                             <div>
@@ -418,18 +423,70 @@
                         </div>
 
                         <div id="pelatihan" class="tab-content d-none">
-                            <div class="card text-center shadow-sm p-4">
-                                <p class="mb-3">Belum ada pelatihan yang sedang diikuti</p>
-                                <img src="{{ asset('assets/images/illustrations/chill-sofa.png') }}" alt="Ilustrasi"
-                                    class="img-fluid mx-auto d-block" width="300" height="300">
-                            </div>
+                            @if ($trainingUser->isEmpty())
+                                <div class="card text-center shadow-sm p-4">
+                                    <p class="mb-3">Belum ada pelatihan yang sedang diikuti</p>
+                                    <img src="{{ asset('assets/images/illustrations/chill-sofa.png') }}" alt="Ilustrasi"
+                                        class="img-fluid mx-auto d-block" width="300" height="300">
+                                </div>
+                            @else
+                                @foreach ($trainingUser as $trainingUsers)
+                                    <div class="card shadow-sm mb-4 border-0">
+                                        <div class="d-flex align-items-start gap-3 px-3 pt-3">
+                                            <img src="{{ asset('storage/' . $trainingUsers->training->thumbnail_image) }}" alt="Logo"
+                                                width="80" class="rounded">
+                                            <div class="flex-grow-1">
+                                                <div class="text-muted small mb-0">
+                                                    {{ $trainingUsers->training->category->name }}</div>
+                                                <a href="{{ route('public.training.show', ['training' => $trainingUsers->training]) }}" class="mb-1 fw-semibold text-dark">
+                                                    {{ $trainingUsers->training->training_name }}</a>
+
+                                                {{-- Tanggal, Lokasi, Penyelenggara (horizontal) --}}
+                                                <div class="d-flex flex-wrap align-items-center text-muted small mt-1 gap-2">
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <i class="ti ti-calendar-event"></i>
+                                                        <span>
+                                                            {{ $trainingUsers->training->start_date->format('d M Y') }} -
+                                                            {{ $trainingUsers->training->end_date->format('d M Y') }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <i class="ti ti-map-pin"></i>
+                                                        <span>{{ $trainingUsers->training->location }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <hr class="my-3 mx-3">
+
+                                        {{-- Tombol aksi --}}
+                                        <div class="d-flex justify-content-end flex-wrap gap-2 px-3 pb-3">
+                                            <a href="#" class="btn btn-outline-primary btn-sm">
+                                                Kerjakan Test Asesmen
+                                            </a>
+                                            <form method="POST" action="#">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm"><i class="ti ti-info-circle me-1"></i>Batal
+                                                    Pendaftaran</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
+
                         <div id="pendampingan" class="tab-content d-none">
                             <div class="card text-center shadow-sm p-4">
                                 <p class="mb-3">Belum ada pendampingan yang sedang diikuti</p>
                                 <img src="{{ asset('assets/images/illustrations/chill-sofa.png') }}" alt="Ilustrasi"
                                     class="img-fluid mx-auto d-block" width="300" height="300">
                             </div>
+                        </div>
+                        <div id="test-asesmen" class="tab-content d-none">
+                            <h5 class="fw-bold">Test Asesmen</h5>
+                            <!-- isi notifikasi -->
                         </div>
                         <div id="notifikasi" class="tab-content d-none">
                             <h5 class="fw-bold">Notifikasi</h5>

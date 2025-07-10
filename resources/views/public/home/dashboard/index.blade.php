@@ -13,7 +13,8 @@
                         Pemberdayaan Masyarakat Desa, Daerah Tertinggal, dan Transmigrasi Banjarmasin
                     </p>
                     <div class="d-flex justify-content-center justify-content-lg-start">
-                        <a href="{{route('public.about.index')}}" class="btn btn-outline-primary px-4 py-2 fw-semibold">Tentang Kami</a>
+                        <a href="{{ route('public.about.index') }}"
+                            class="btn btn-outline-primary px-4 py-2 fw-semibold">Tentang Kami</a>
                     </div>
                 </div>
                 <!-- KANAN: Ilustrasi -->
@@ -38,7 +39,8 @@
                             <h6 class="card-title fw-semibold mb-1">Pelatihan</h6>
                             <p class="card-text small mb-2">Temukan berbagai pelatihan berkualitas yang sesuai dengan
                                 kebutuhan Anda.</p>
-                            <a href="{{route('public.training.index')}}" class="btn btn-outline-primary w-100">Selengkapnya</a>
+                            <a href="{{ route('public.training.index') }}"
+                                class="btn btn-outline-primary w-100">Selengkapnya</a>
                         </div>
                     </div>
                 </div>
@@ -66,136 +68,55 @@
                             <h6 class="card-title fw-semibold mb-1">Pembelajaran</h6>
                             <p class="card-text small mb-2">Temukan berbagai materi pembelajaran untuk memperluas wawasan
                                 Anda.</p>
-                            <a href="{{route('public.learning.index')}}" class="btn btn-outline-primary w-100">Selengkapnya</a>
+                            <a href="{{ route('public.learning.index') }}"
+                                class="btn btn-outline-primary w-100">Selengkapnya</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    {{-- <section class="bg-primary">
-        <div class="container py-5">
-            <h4 class="text-white mb-4 fw-semibold">Pelatihan Terbaru</h4>
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="card shadow-sm rounded-4 border-0 overflow-hidden">
-                        <!-- Gambar header -->
-                        <div class="position-relative">
-                            <img src="assets/images/logos/testing.jpg" class="img-fluid w-100" alt="AI Engineer">
-                        </div>
 
-                        <!-- Konten Card -->
-                        <div class="card-body">
-                            <p class="text-muted small mb-1">Pelatihan (Kategori)</p>
-                            <h6 class="fw-bold mb-3">AI Engineer For Milenial (Judul)</h6>
-
-                            <div class="d-flex align-items-center text-muted small">
-                                <i class="bi bi-people me-2"></i> <!-- Gunakan Bootstrap Icons -->
-                                <span class="fw-medium">3918 Peserta (Total Peserta)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section> --}}
     <section class="bg-primary text-white py-5">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h4 class="fw-semibold text-white">Pelatihan Terbaru</h4>
-                    <p class="mb-0">Ayo, ikuti pelatihan menarik yang dapat kamu selesaikan secara mandiri. Belajar jadi
+                    <p class="mb-0">Ayo, ikuti pelatihan menarik yang dapat meningkatkan keterampilan kamu. Belajar jadi
                         lebih asyik dan praktis.</p>
                 </div>
-                <a href="{{route('public.training.index')}}" class="text-white fw-semibold text-decoration-none d-flex align-items-center">
+                <a href="{{ route('public.training.index') }}"
+                    class="text-white fw-semibold text-decoration-none d-flex align-items-center">
                     Lihat Semua <i class="ti ti-chevron-right"></i>
                 </a>
             </div>
 
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
                 <!-- Card -->
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="card h-100 rounded-4 overflow-hidden">
-                        <img src="assets/images/logos/thumbnail.png" class="card-img-top" alt="SMA">
-                        <div class="card-body d-flex flex-column justify-content-between">
-                            <div>
-                                <small class="text-muted d-block mb-2">Badan Usaha Milik Desa</small>
-                                <div class="fw-semibold small mb-2">
-                                    <a href=""
-                                        class="fw-semibold text-dark text-decoration-none hover-underline">Pengelolaan BUM
-                                        Desa Tematik Penyusunan Laporan Keuangan Angkatan 1</a>
+                @foreach ($trainings as $training)
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="card h-100 rounded-4 overflow-hidden">
+                            <img src="{{ asset('storage/' . $training->thumbnail_image) }}" class="card-img-top" alt="gambar-pelatihan">
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <div>
+                                    <small class="text-muted d-block mb-2">Pelatihan</small>
+                                    <div class="fw-semibold small mb-2">
+                                        <a href="{{ route('public.training.show', ['training' => $training]) }}"
+                                            class="fw-semibold text-dark text-decoration-none hover-underline">{{ str($training->training_name)->limit(50) }}</a>
 
+                                    </div>
                                 </div>
+                                <div class="text-muted small"><i class="ti ti-calendar-event"></i><span
+                                        class="ms-1">{{ $training->start_date->format('d M Y') }}
+                                        - {{ $training->end_date->format('d M Y') }}</span></div>
                             </div>
-                            <div class="text-muted small"><i class="ti ti-calendar-event"></i><span class="ms-1">29 Jun
-                                    2025</span></div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="card h-100 rounded-4 overflow-hidden">
-                        <img src="assets/images/logos/thumbnail.png" class="card-img-top" alt="SMA">
-                        <div class="card-body d-flex flex-column justify-content-between">
-                            <div>
-                                <small class="text-muted d-block mb-2">Badan Usaha Milik Desa</small>
-                                <div class="fw-semibold small mb-2">
-                                    <a href=""
-                                        class="fw-semibold text-dark text-decoration-none hover-underline">Pengelolaan BUM
-                                        Desa Tematik Penyusunan Laporan Keuangan Angkatan 2</a>
-                                </div>
-                            </div>
-                            <div class="text-muted small"><i class="ti ti-calendar-event"></i><span class="ms-1">29 Jun
-                                    2025</span></div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 3 -->
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="card h-100 rounded-4 overflow-hidden">
-                        <img src="assets/images/logos/thumbnail.png" class="card-img-top" alt="SMA">
-                        <div class="card-body d-flex flex-column justify-content-between">
-                            <div>
-                                <small class="text-muted d-block mb-2">Badan Usaha Milik Desa</small>
-                                <div class="fw-semibold small mb-2">
-                                    <a href=""
-                                        class="fw-semibold text-dark text-decoration-none hover-underline">Pengelolaan BUM
-                                        Desa Tematik Penyusunan Laporan Keuangan Angkatan 3</a>
-
-                                </div>
-                            </div>
-                            <div class="text-muted small"><i class="ti ti-calendar-event"></i><span class="ms-1">29 Jun
-                                    2025</span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 4 -->
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="card h-100 rounded-4 overflow-hidden">
-                        <img src="assets/images/logos/thumbnail.png" class="card-img-top" alt="SMA">
-                        <div class="card-body d-flex flex-column justify-content-between">
-                            <div>
-                                <small class="text-muted d-block mb-1">Tata Kelola Lahan Gambut Untuk Pertanian
-                                    Berkelanjutan</small>
-                                <div class="fw-semibold small mb-2">
-                                    <a href=""
-                                        class="fw-semibold text-dark text-decoration-none hover-underline">Pengelolaan BUM
-                                        Desa Tematik Penyusunan Laporan Keuangan Angkatan 4 Testins Testing Testing</a>
-                                </div>
-                            </div>
-                            <div class="text-muted small mt-2">
-                                <i class="ti ti-calendar-event"></i>
-                                <span class="ms-1">29 Jun 2025</span>
-                            </div>
-                            {{-- <div class="text-muted small"><i class="ti ti-map-pin"></i><span class="ms-1">Banjarmasin, Kalimantan Selatan</span></div> --}}
-                        </div>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
+
     <section class="py-5 bg-light-primary">
         <div class="container">
             <div class="row align-items-center">
@@ -207,7 +128,7 @@
                         Balai Pemberdayaan dan Pemberdayaan
                         Masyarakat Desa, Daerah Tertinggal, dan Transmigrasi Banjarmasin
                     </p>
-                    <a href="{{route('public.training.index')}}" class="btn btn-primary px-4 py-2 fw-semibold"
+                    <a href="{{ route('public.training.index') }}" class="btn btn-primary px-4 py-2 fw-semibold"
                         onmouseover="this.classList.replace('btn-primary', 'btn-outline-primary')"
                         onmouseout="this.classList.replace('btn-outline-primary', 'btn-primary')">
                         Yuk Ikuti Kegiatan
@@ -333,4 +254,6 @@
             </div>
         </div>
     </section>
+
+    
 @endsection
