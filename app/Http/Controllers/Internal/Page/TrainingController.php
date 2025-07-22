@@ -13,7 +13,7 @@ class TrainingController extends Controller
 {
     public function index()
     {
-        $trainings = Training::all();
+        $trainings = Training::all()->sortByDesc('created_at'); // Sort by created_at in descending order
         return view('internal.training.index', [
             'trainings' => $trainings,
         ]);

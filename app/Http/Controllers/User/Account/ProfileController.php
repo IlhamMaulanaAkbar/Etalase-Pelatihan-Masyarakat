@@ -8,25 +8,117 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\TrainingUser;
 use App\Models\User;
+use App\Models\PreTestUsersAnswers;
+use App\Models\PreTestQuestions;
+use App\Models\PostTestQuestions;
+use App\Models\PostTestUsersAnswers;
+use App\Models\TrainingEvaluationQuestions;
+use App\Models\TrainingEvaluationUsersAnswers;
+use App\Models\InstructorEvaluationQuestions;
+use App\Models\InstructorEvaluationUsersAnswers;
 
 class ProfileController extends Controller
 {
-    public function index(Request $request, Training $training)
+    public function index(Request $request)
     {
         $user = $request->user();
 
-        // Ambil data pendaftaran pelatihan user yang statusnya "DAFTAR"
         $trainingUser = $user->training_users()
-            ->with('training') // jika ingin akses data pelatihan terkait
-            ->where('status', 'DAFTAR')
-            ->get();
+            ->with(['training', 'training.category'])->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($item) use ($user) {
+                // Cek apakah sudah mengerjakan pre-test
+
+
+                $trainingUserRow = $user->training_users()->where('training_id', $item->training_id)->first();
+                // Ambil pertanyaan evaluasi pelatihan
+                $evaluationQuestions = TrainingEvaluationQuestions::where('training_id', $item->training_id)->get();
+                $item->evaluation_questions = $evaluationQuestions->count();
+
+                // Tampilkan tombol evaluasi jika sudah LULUS dan pelatihan selesai
+                $item->show_evaluation = $item->status === 'LULUS' && optional($item->training->end_date)->isPast();
+
+                // Cek apakah user sudah mengisi evaluasi
+                $evaluationAnswered = TrainingEvaluationUsersAnswers::where('users_id', $user->id)
+                    ->whereIn('teq_id', $evaluationQuestions->pluck('id'))
+                    ->orderBy('created_at', 'desc')
+                    ->value('created_at');
+
+                $item->has_filled_evaluation = $evaluationAnswered;
+                $item->evaluation_finished_at = $evaluationAnswered
+                    ? $evaluationAnswered->toIso8601String()
+                    : ($trainingUserRow && $trainingUserRow->started_training_evaluation ? optional($trainingUserRow->updated_at)->toIso8601String() : null);
+
+                // Ambil pertanyaan evaluasi instruktur
+                $instructorEvaluationQuestions = InstructorEvaluationQuestions::where('training_id', $item->training_id)->get();
+                $item->instructor_evaluation_questions = $instructorEvaluationQuestions->count();
+
+                // Tampilkan tombol evaluasi instruktur jika sudah LULUS dan pelatihan selesai
+                $item->show_instructor_evaluation = $item->status === 'LULUS' && optional($item->training->end_date)->isPast();
+
+                // Cek apakah user sudah mengisi evaluasi instruktur
+                $instructorEvaluationAnswered = InstructorEvaluationUsersAnswers::where('users_id', $user->id)
+                    ->whereIn('ieq_id', $instructorEvaluationQuestions->pluck('id'))
+                    ->orderBy('created_at', 'desc')
+                    ->value('created_at');
+                    
+                $item->has_filled_instructor_evaluation = $instructorEvaluationAnswered;
+                $item->instructor_evaluation_finished_at = $instructorEvaluationAnswered
+                    ? $instructorEvaluationAnswered->toIso8601String()
+                    : ($trainingUserRow && $trainingUserRow->started_instructor_evaluation ? optional($trainingUserRow->updated_at)->toIso8601String() : null);
+
+
+                $preTestQuestions = PreTestQuestions::where('training_id', $item->training_id)->get();
+                $answeredCount = PreTestUsersAnswers::where('users_id', $user->id)
+                    ->whereIn('pre_test_questions_id', $preTestQuestions->pluck('id'))
+                    ->whereNotNull('answer')
+                    ->count();
+
+
+                $item->has_pretest_answered = $trainingUserRow && $trainingUserRow->started_pretest;
+
+                $latestAnsweredAt = PreTestUsersAnswers::where('users_id', $user->id)
+                    ->whereIn('pre_test_questions_id', $preTestQuestions->pluck('id'))
+                    ->orderBy('created_at', 'desc')
+                    ->value('created_at');
+
+                $item->finished_at = $latestAnsweredAt
+                    ? $latestAnsweredAt->toIso8601String()
+                    : ($trainingUserRow && $trainingUserRow->started_pretest ? optional($trainingUserRow->updated_at)->toIso8601String() : null);
+
+
+                $item->questions = $preTestQuestions->count();
+                $item->duration = 15;
+
+                $postTestQuestions = PostTestQuestions::where('training_id', $item->training_id)->get();
+
+                $item->show_posttest = $item->status === 'LULUS' &&
+                    $item->has_pretest_answered &&
+                    optional($item->training->end_date)->isPast();
+
+
+                $item->has_posttest_answered = $trainingUserRow && $trainingUserRow->started_posttest;
+
+                $latestPostAnsweredAt = PostTestUsersAnswers::where('users_id', $user->id)
+                    ->whereIn('post_test_questions_id', $postTestQuestions->pluck('id'))
+                    ->orderBy('created_at', 'desc')
+                    ->value('created_at');
+
+                $item->posttest_finished_at = $latestPostAnsweredAt
+                    ? $latestPostAnsweredAt->toIso8601String()
+                    : ($item->has_posttest_answered ? optional($trainingUserRow->updated_at)->toIso8601String() : null);
+
+                $item->posttest_questions = $postTestQuestions->count();
+                $item->posttest_duration = 15;
+
+                return $item;
+            });
 
         return view('public.account.profile.index', [
             'user' => $user,
             'trainingUser' => $trainingUser,
         ]);
     }
-
 
     public function update(Request $request)
     {

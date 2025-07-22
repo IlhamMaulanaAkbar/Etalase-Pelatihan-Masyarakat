@@ -19,6 +19,7 @@ class TrainingUser extends Model
         'letter_statement',
         'letter_recommendation',
         'is_approved',
+        'started_pretest',
         'verified_at',
     ];
 

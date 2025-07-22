@@ -9,7 +9,13 @@ use App\Http\Controllers\Internal\Page\TrainingParticipantController;
 use App\Http\Controllers\Internal\TestAssessment\PreTestController;
 use App\Http\Controllers\Internal\TestAssessment\PostTestController;
 use App\Http\Controllers\Internal\Evaluations\TrainingEvaluationController;
+use App\Http\Controllers\Internal\Evaluations\InstructorEvaluationController;
+use App\Http\Controllers\Internal\Page\UsersController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Internal\Page\TrainingEvaluationController as EvaluationTrainingController;
+use App\Http\Controllers\Internal\Page\InstructorEvaluationController as EvaluationInstructorController;
+
+
 
 Route::prefix('internal')->group(function () {
     Route::middleware(['guest:internal'])->group(function () {
@@ -43,6 +49,11 @@ Route::prefix('internal')->group(function () {
         Route::get('/training-participants/{training}', [TrainingParticipantController::class, 'show'])->name('internal.training.participants.show');
         Route::put('/training-participants/{training_user}', [TrainingParticipantController::class, 'status'])->name('internal.training.participants.status');
 
+        Route::get('/evaluations/training-evaluations', [EvaluationTrainingController::class, 'index'])->name('internal.page.training-evaluation.index');
+        Route::get('/evaluations/training-evaluations/{training}', [EvaluationTrainingController::class, 'show'])->name('internal.page.training-evaluation.show');
+        Route::get('/evaluations/instructor-evaluations', [EvaluationInstructorController::class, 'index'])->name('internal.page.instructor-evaluation.index');
+        Route::get('/evaluations/instructor-evaluations/{training}', [EvaluationInstructorController::class, 'show'])->name('internal.page.instructor-evaluation.show');
+
         Route::prefix('training/{training}/test-assessment')->group(function () {
             Route::get('/pre-test', [PreTestController::class, 'index'])->name('internal.test-assessment.pre-test.index');
             Route::get('/pre-test/create', [PreTestController::class, 'create'])->name('internal.test-assessment.pre-test.create');
@@ -66,6 +77,15 @@ Route::prefix('internal')->group(function () {
             Route::get('/training-evaluations/{training_evaluation}/edit', [TrainingEvaluationController::class, 'edit'])->name('internal.evaluations.training-evaluation.edit');
             Route::put('/training-evaluations/{training_evaluation}', [TrainingEvaluationController::class, 'update'])->name('internal.evaluations.training-evaluation.update');
             Route::delete('/training-evaluations/{training_evaluation}', [TrainingEvaluationController::class, 'destroy'])->name('internal.evaluations.training-evaluation.destroy');
+
+            Route::get('/instructor-evaluations', [InstructorEvaluationController::class, 'index'])->name('internal.evaluations.instructor-evaluation.index');
+            Route::get('/instructor-evaluations/create', [InstructorEvaluationController::class, 'create'])->name('internal.evaluations.instructor-evaluation.create');
+            Route::post('/instructor-evaluations', [InstructorEvaluationController::class, 'store'])->name('internal.evaluations.instructor-evaluation.store');
+            Route::get('/instructor-evaluations/{instructor_evaluation}/edit', [InstructorEvaluationController::class, 'edit'])->name('internal.evaluations.instructor-evaluation.edit');
+            Route::put('/instructor-evaluations/{instructor_evaluation}', [InstructorEvaluationController::class, 'update'])->name('internal.evaluations.instructor-evaluation.update');
+            Route::delete('/instructor-evaluations/{instructor_evaluation}', [InstructorEvaluationController::class, 'destroy'])->name('internal.evaluations.instructor-evaluation.destroy');
         });
+
+        Route::get('/users', [UsersController::class, 'index'])->name('internal.users.index');
     });
 });

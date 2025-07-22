@@ -12,9 +12,9 @@ class TrainingEvaluationUsersAnswers extends Model
     protected $table = 'training_evaluation_users_answers';
 
     protected $fillable = [
-        'training_evaluation_questions_id',
+        'teq_id',
         'users_id',
-        'answer',
+        'answers',
     ];
 
     public function question()

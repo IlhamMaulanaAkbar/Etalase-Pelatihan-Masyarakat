@@ -45,6 +45,6 @@ class User extends Authenticatable
 
     public function training_users()
     {
-        return $this->hasMany(TrainingUser::class);
+        return $this->hasMany(TrainingUser::class, 'user_id');
     }
 }

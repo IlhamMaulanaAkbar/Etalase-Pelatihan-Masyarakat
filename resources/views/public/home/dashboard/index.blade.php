@@ -96,7 +96,8 @@
                 @foreach ($trainings as $training)
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                         <div class="card h-100 rounded-4 overflow-hidden">
-                            <img src="{{ asset('storage/' . $training->thumbnail_image) }}" class="card-img-top" alt="gambar-pelatihan">
+                            <img src="{{ asset('storage/' . $training->thumbnail_image) }}" class="card-img-top"
+                                alt="gambar-pelatihan">
                             <div class="card-body d-flex flex-column justify-content-between">
                                 <div>
                                     <small class="text-muted d-block mb-2">Pelatihan</small>
@@ -146,7 +147,7 @@
                                 <div class="card-body d-flex justify-content-between align-items-center social-user">
                                     <div>
                                         <small class="text-muted">Pelatihan</small>
-                                        <h4 class="fw-bolder text-primary mb-0">301</h4>
+                                        <h4 class="fw-bolder text-primary mb-0">{{ $totalTrainings }}</h4>
                                     </div>
                                     <i class="ti ti-chalkboard text-muted fs-2"></i>
                                 </div>
@@ -170,7 +171,7 @@
                                 <div class="card-body d-flex justify-content-between align-items-center social-user">
                                     <div>
                                         <small class="text-muted">Peserta</small>
-                                        <h4 class="fw-bolder text-primary mb-0 ">582249</h4>
+                                        <h4 class="fw-bolder text-primary mb-0 ">{{ $totalUsers }}</h4>
                                     </div>
                                     <i class="ti ti-users text-muted fs-2"></i>
                                 </div>
@@ -183,7 +184,7 @@
                                 <div class="card-body d-flex justify-content-between align-items-center social-user">
                                     <div>
                                         <small class="text-muted">Video</small>
-                                        <h4 class="fw-bolder text-primary mb-0">653</h4>
+                                        <h4 class="fw-bolder text-primary mb-0">{{ $totalLearnings }}</h4>
                                     </div>
                                     <i class="ti ti-brand-youtube text-muted fs-2"></i>
                                 </div>
@@ -254,6 +255,4 @@
             </div>
         </div>
     </section>
-
-    
 @endsection

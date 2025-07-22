@@ -35,7 +35,12 @@
                         </li>
                         <li class="nav-item mb-1">
                             <button class="nav-link text-black-50 fw-semibold tab-link " data-target="test-asesmen">
-                                <i class="ti ti-book me-1"></i>Test Asesmen
+                                <i class="ti ti-book me-1"></i>Tes Asesmen
+                            </button>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <button class="nav-link text-black-50 fw-semibold tab-link " data-target="evaluasi">
+                                <i class="ti ti-pencil-plus me-1"></i>Evaluasi
                             </button>
                         </li>
                         <li class="nav-item mb-1">
@@ -433,16 +438,28 @@
                                 @foreach ($trainingUser as $trainingUsers)
                                     <div class="card shadow-sm mb-4 border-0">
                                         <div class="d-flex align-items-start gap-3 px-3 pt-3">
-                                            <img src="{{ asset('storage/' . $trainingUsers->training->thumbnail_image) }}" alt="Logo"
-                                                width="80" class="rounded">
+                                            <img src="{{ asset('storage/' . $trainingUsers->training->thumbnail_image) }}"
+                                                alt="Logo" width="80" class="rounded">
                                             <div class="flex-grow-1">
-                                                <div class="text-muted small mb-0">
-                                                    {{ $trainingUsers->training->category->name }}</div>
-                                                <a href="{{ route('public.training.show', ['training' => $trainingUsers->training]) }}" class="mb-1 fw-semibold text-dark">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div class="text-muted small mb-0">
+                                                        {{ $trainingUsers->training->category->name }}
+                                                    </div>
+                                                    @if ($trainingUsers->status === 'LULUS')
+                                                        <span class="badge rounded-pill bg-success fs-2">Diterima</span>
+                                                    @elseif ($trainingUsers->status === 'DAFTAR')
+                                                        <span class="badge rounded-pill bg-warning fs-2">Menunggu</span>
+                                                    @elseif ($trainingUsers->status === 'BATAL')
+                                                        <span class="badge rounded-pill bg-danger fs-2">Dibatalkan</span>
+                                                    @endif
+                                                </div>
+                                                <a href="{{ route('public.training.show', ['training' => $trainingUsers->training]) }}"
+                                                    class="mb-1 fw-semibold text-dark">
                                                     {{ $trainingUsers->training->training_name }}</a>
 
                                                 {{-- Tanggal, Lokasi, Penyelenggara (horizontal) --}}
-                                                <div class="d-flex flex-wrap align-items-center text-muted small mt-1 gap-2">
+                                                <div
+                                                    class="d-flex flex-wrap align-items-center text-muted small mt-1 gap-2">
                                                     <div class="d-flex align-items-center gap-1">
                                                         <i class="ti ti-calendar-event"></i>
                                                         <span>
@@ -461,16 +478,91 @@
                                         <hr class="my-3 mx-3">
 
                                         {{-- Tombol aksi --}}
-                                        <div class="d-flex justify-content-end flex-wrap gap-2 px-3 pb-3">
-                                            <a href="#" class="btn btn-outline-primary btn-sm">
-                                                Kerjakan Test Asesmen
-                                            </a>
-                                            <form method="POST" action="#">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm"><i class="ti ti-info-circle me-1"></i>Batal
-                                                    Pendaftaran</button>
-                                            </form>
+                                        <div
+                                            class="d-flex justify-content-end flex-wrap align-items-center gap-2 px-3 pb-3">
+                                            @if ($trainingUsers->status == 'DAFTAR' || $trainingUsers->status == 'LULUS')
+                                                @if (!$trainingUsers->has_pretest_answered)
+                                                    @if ($trainingUsers->questions > 0)
+                                                        <a href="{{ route('public.test-assessment.pre-test.start', ['training' => $trainingUsers->training->id]) }}"
+                                                            class="btn btn-outline-primary btn-sm">
+                                                            <i class="ti ti-book me-1"></i>Kerjakan Tes Asesmen
+                                                        </a>
+                                                    @else
+                                                        <!-- Tombol untuk modal jika soal belum tersedia -->
+                                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#noQuestionsModal{{ $trainingUsers->id }}">
+                                                            <i class="ti ti-book me-1"></i>Kerjakan Tes Asesmen
+                                                        </button>
+                                                    @endif
+                                                @endif
+
+                                                @if ($trainingUsers->status == 'LULUS')
+                                                    <!-- Tombol Batal hanya jika status LULUS -->
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#batalModal{{ $trainingUsers->id }}">
+                                                        <i class="ti ti-info-circle me-1"></i> Batal Pendaftaran
+                                                    </button>
+                                                @endif
+                                            @endif
+                                        </div>
+                                        <div class="modal fade" id="noQuestionsModal{{ $trainingUsers->id }}"
+                                            tabindex="-1"
+                                            aria-labelledby="noQuestionsModalLabel{{ $trainingUsers->id }}"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header justify-content-center bg-danger">
+                                                        <h5 class="modal-title text-center w-100 text-white"
+                                                            id="noQuestionsModalLabel{{ $trainingUsers->id }}">
+                                                            Tes Belum Tersedia
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body text-center">
+                                                        Mohon maaf, tes asesmen untuk pelatihan
+                                                        <strong>{{ $trainingUsers->training->training_name }}</strong>
+                                                        belum tersedia saat ini.
+                                                    </div>
+                                                    <div class="modal-footer justify-content-center">
+                                                        <button type="button" class="btn btn-outline-danger"
+                                                            data-bs-dismiss="modal">Tutup</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Modal Konfirmasi Batal -->
+                                        <div class="modal fade" id="batalModal{{ $trainingUsers->id }}" tabindex="-1"
+                                            aria-labelledby="batalModalLabel{{ $trainingUsers->id }}" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0 bg-danger">
+                                                        <h5 class="modal-title text-center w-100 text-white"
+                                                            id="batalModalLabel{{ $trainingUsers->id }}">Konfirmasi
+                                                            Pembatalan</h5>
+                                                        <button type="button" class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Apakah Anda yakin ingin membatalkan pelatihan ini?<br>
+                                                        <strong>Membatalkan</strong> ini akan membuat Anda tidak bisa
+                                                        mendaftar pelatihan yang telah Anda daftarkan.
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <form method="POST"
+                                                            action="{{ route('public.training.destroy', $trainingUsers->id) }}">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="button" class="btn btn-outline-primary"
+                                                                data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit" class="btn btn-danger">Ya,
+                                                                Batalkan</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -485,9 +577,331 @@
                             </div>
                         </div>
                         <div id="test-asesmen" class="tab-content d-none">
-                            <h5 class="fw-bold">Test Asesmen</h5>
-                            <!-- isi notifikasi -->
+                            <h6 class="fw-semibold mb-0 text-black-50">Riwayat Tes Asesmen</h6>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>Ditemukan {{ $trainingUser->count() }} Tes Asesmen</div>
+                                <select class="form-select form-select-sm w-auto">
+                                    <option selected>Terbaru</option>
+                                    <option>Terlama</option>
+                                </select>
+                            </div>
+
+                            @if ($trainingUser->isEmpty())
+                                <div class="card text-center shadow-sm p-4">
+                                    <p class="mb-3">Belum ada tes asesmen</p>
+                                    <img src="{{ asset('assets/images/illustrations/chill-sofa.png') }}" alt="Ilustrasi"
+                                        class="img-fluid mx-auto d-block" width="300" height="300">
+                                </div>
+                            @else
+                                @foreach ($trainingUser as $trainingUsers)
+                                    <div class="card shadow-sm mb-3 border-0">
+                                        <div class="d-flex align-items-center gap-3 px-3 pt-3">
+                                            <img src="{{ asset('storage/' . $trainingUsers->training->thumbnail_image) }}"
+                                                alt="Logo" width="100" class="rounded">
+
+                                            <div class="flex-grow-1">
+                                                <div class="fw-semibold">Test Asesmen
+                                                </div>
+                                                <div class="text-muted small">
+                                                    {{ $trainingUsers->training->category->name }}</div>
+                                                <div class="fw-bold">{{ $trainingUsers->training->training_name }}</div>
+
+                                                <div class="d-flex flex-wrap gap-3 mt-2 text-muted small">
+                                                    <div><i class="ti ti-file-pencil"></i> {{ $trainingUsers->questions }}
+                                                        Soal</div>
+                                                    <div><i class="ti ti-clock"></i> {{ $trainingUsers->duration }} Menit
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Tombol aksi atau status -->
+                                        <div class="px-3 pb-3">
+                                            @if ($trainingUsers->has_pretest_answered)
+                                                <div class="text-success small mt-2">
+                                                    <i class="ti ti-check"></i> Pre Test Sudah Dikerjakan :
+                                                    <span class="user-time"
+                                                        data-time="{{ $trainingUsers->finished_at }}"></span>
+                                                </div>
+                                            @elseif ($trainingUsers->questions > 0)
+                                                <div class="d-flex justify-content-end align-items-center">
+                                                    <a href="{{ route('public.test-assessment.pre-test.start', ['training' => $trainingUsers->training->id]) }}"
+                                                        class="btn btn-outline-primary btn-sm">
+                                                        <i class="ti ti-book me-1"></i>Kerjakan Pre Test
+                                                    </a>
+                                                </div>
+                                            @else
+                                                <div class="d-flex justify-content-end align-items-center">
+                                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#noPretestModal{{ $trainingUsers->id }}">
+                                                        <i class="ti ti-book me-1"></i>Kerjakan Pre Test
+                                                    </button>
+                                                </div>
+                                            @endif
+
+                                            {{-- === POST-TEST (Jika Syarat Terpenuhi) === --}}
+                                            @if ($trainingUsers->show_posttest)
+                                                @if ($trainingUsers->has_posttest_answered)
+                                                    <div class="text-success small mt-2">
+                                                        <i class="ti ti-check"></i> Post Test sudah dikerjakan :
+                                                        <span class="user-time"
+                                                            data-time="{{ $trainingUsers->posttest_finished_at }}"></span>
+                                                    </div>
+                                                @elseif ($trainingUsers->posttest_questions > 0)
+                                                    <div class="d-flex justify-content-end align-items-center">
+                                                        <a href="{{ route('public.test-assessment.post-test.start', ['training' => $trainingUsers->training->id]) }}"
+                                                            class="btn btn-outline-primary btn-sm">
+                                                            <i class="ti ti-book me-1"></i>Kerjakan Post-Test
+                                                        </a>
+                                                    </div>
+                                                @else
+                                                    <div class="d-flex justify-content-end align-items-center">
+                                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#noPosttestModal{{ $trainingUsers->id }}">
+                                                            <i class="ti ti-book me-1"></i>Kerjakan Post-Test
+                                                        </button>
+                                                    </div>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <!-- MODAL PRE-TEST TIDAK TERSEDIA -->
+                                    <div class="modal fade" id="noPretestModal{{ $trainingUsers->id }}" tabindex="-1"
+                                        aria-labelledby="noPretestModalLabel{{ $trainingUsers->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow">
+                                                <div class="modal-header bg-danger text-white justify-content-center">
+                                                    <h5 class="modal-title text-white text-center w-100"
+                                                        id="noPretestModalLabel{{ $trainingUsers->id }}">
+                                                        Tes Pre-Test Belum Tersedia
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body text-center">
+                                                    Mohon maaf, pre-test untuk pelatihan
+                                                    <strong>{{ $trainingUsers->training->training_name }}</strong> belum
+                                                    tersedia saat ini.
+                                                </div>
+                                                <div class="modal-footer justify-content-center">
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                        data-bs-dismiss="modal">Tutup</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- MODAL POST-TEST TIDAK TERSEDIA -->
+                                    <div class="modal fade" id="noPosttestModal{{ $trainingUsers->id }}" tabindex="-1"
+                                        aria-labelledby="noPosttestModalLabel{{ $trainingUsers->id }}"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow">
+                                                <div class="modal-header bg-danger text-white justify-content-center">
+                                                    <h5 class="modal-title text-white text-center w-100"
+                                                        id="noPosttestModalLabel{{ $trainingUsers->id }}">
+                                                        Tes Post-Test Belum Tersedia
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white"
+                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body text-center">
+                                                    Mohon maaf, post-test untuk pelatihan
+                                                    <strong>{{ $trainingUsers->training->training_name }}</strong> belum
+                                                    tersedia saat ini.
+                                                </div>
+                                                <div class="modal-footer justify-content-center">
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                        data-bs-dismiss="modal">Tutup</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
+
+                        <div id="evaluasi" class="d-none">
+                            <div class="card py-4 px-4 shadow-sm border-0">
+                                <ul class="nav nav-tabs mb-3" id="evaluasiTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="pelatihan-tab" data-bs-toggle="tab"
+                                            data-bs-target="#evaluasi-pelatihan" type="button" role="tab">
+                                            Pelatihan
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="instruktur-tab" data-bs-toggle="tab"
+                                            data-bs-target="#evaluasi-instruktur" type="button" role="tab">
+                                            Instruktur
+                                        </button>
+                                    </li>
+                                </ul>
+    
+                                {{-- Konten Evaluasi --}}
+                                <div class="tab-content">
+                                    {{-- ==== TAB EVALUASI PELATIHAN ==== --}}
+                                    <div class="tab-pane fade show active" id="evaluasi-pelatihan" role="tabpanel">
+                                        @php
+                                            $evaluasiPelatihan = $trainingUser->filter(fn($t) => $t->show_evaluation);
+                                        @endphp
+    
+                                        @if ($evaluasiPelatihan->isEmpty())
+                                            <div class="card text-center shadow-sm p-4">
+                                                <p class="mb-3">Belum ada evaluasi pelatihan yang tersedia</p>
+                                                <img src="{{ asset('assets/images/illustrations/chill-sofa.png') }}"
+                                                    class="img-fluid mx-auto d-block" width="300">
+                                            </div>
+                                        @else
+                                            @foreach ($evaluasiPelatihan as $trainingUsers)
+                                                <div class="card shadow-sm mb-3 border-0">
+                                                    <div class="d-flex align-items-center gap-3 px-3 pt-3">
+                                                        <img src="{{ asset('storage/' . $trainingUsers->training->thumbnail_image) }}"
+                                                            width="100" class="rounded">
+                                                        <div class="flex-grow-1">
+                                                            <div class="fw-semibold">Evaluasi Pelatihan</div>
+                                                            <div class="fw-bold">
+                                                                {{ $trainingUsers->training->training_name }}</div>
+                                                            <div class="text-muted small">
+                                                                {{ $trainingUsers->training->category->name }}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-end align-items-center px-3 pb-3">
+                                                        @if ($trainingUsers->has_filled_evaluation)
+                                                            <div class="text-success small mt-2">
+                                                                <i class="ti ti-check"></i> Evaluasi sudah diisi pada <span class="user-time"
+                                                            data-time="{{ $trainingUsers->evaluation_finished_at }}"></span>
+                                                            </div>
+                                                        @elseif ($trainingUsers->evaluation_questions > 0)
+                                                            <a href="{{ route('public.evaluations.training.start', ['training' => $trainingUsers->training->id]) }}"
+                                                                class="btn btn-outline-primary btn-sm mt-2">
+                                                                <i class="ti ti-book"></i> Mengisi Evaluasi
+                                                            </a>
+                                                        @else
+                                                            <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#noEvaluasiModal{{ $trainingUsers->id }}">
+                                                                <i class="ti ti-book"></i> Mengisi Evaluasi
+                                                            </button>
+                                                        @endif
+                                                    </div>
+                                                </div>
+    
+                                                {{-- Modal Evaluasi Pelatihan --}}
+                                                <div class="modal fade" id="noEvaluasiModal{{ $trainingUsers->id }}"
+                                                    tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content border-0 shadow">
+                                                            <div
+                                                                class="modal-header bg-danger text-white justify-content-center">
+                                                                <h5 class="modal-title text-white text-center w-100">
+                                                                    Evaluasi Pelatihan Belum Tersedia
+                                                                </h5>
+                                                                <button type="button" class="btn-close btn-close-white"
+                                                                    data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body text-center">
+                                                                Evaluasi untuk pelatihan
+                                                                <strong>{{ $trainingUsers->training->training_name }}</strong>
+                                                                belum tersedia.
+                                                            </div>
+                                                            <div class="modal-footer justify-content-center">
+                                                                <button type="button" class="btn btn-outline-danger"
+                                                                    data-bs-dismiss="modal">Tutup</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
+                                    </div>
+    
+                                    {{-- ==== TAB EVALUASI INSTRUKTUR ==== --}}
+                                    <div class="tab-pane fade" id="evaluasi-instruktur" role="tabpanel">
+                                        @php
+                                            $evaluasiInstruktur = $trainingUser->filter(
+                                                fn($t) => $t->show_instructor_evaluation,
+                                            );
+                                        @endphp
+    
+                                        @if ($evaluasiInstruktur->isEmpty())
+                                            <div class="card text-center shadow-sm p-4">
+                                                <p class="mb-3">Belum ada evaluasi instruktur yang tersedia</p>
+                                                <img src="{{ asset('assets/images/illustrations/chill-sofa.png') }}"
+                                                    class="img-fluid mx-auto d-block" width="300">
+                                            </div>
+                                        @else
+                                            @foreach ($evaluasiInstruktur as $trainingUsers)
+                                                <div class="card shadow-sm mb-3 border-0">
+                                                    <div class="d-flex align-items-center gap-3 px-3 pt-3">
+                                                        <img src="{{ asset('storage/' . $trainingUsers->training->thumbnail_image) }}"
+                                                            width="100" class="rounded">
+                                                        <div class="flex-grow-1">
+                                                            <div class="fw-semibold">Evaluasi Instruktur</div>
+                                                            <div class="fw-bold">
+                                                                {{ $trainingUsers->training->training_name }}</div>
+                                                                <div class="text-muted small">
+                                                                    {{ $trainingUsers->training->category->name }}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-end align-items-center px-3 pb-3">
+                                                        @if ($trainingUsers->has_filled_instructor_evaluation)
+                                                            <div class="text-success small mt-2">
+                                                                <i class="ti ti-check"></i> Evaluasi instruktur sudah diisi pada <span class="user-time"
+                                                                    data-time="{{ $trainingUsers->instructor_evaluation_finished_at }}"></span>
+                                                            </div>
+                                                        @elseif ($trainingUsers->instructor_evaluation_questions > 0)
+                                                            <a href="{{ route('public.evaluations.instructor.start', ['training' => $trainingUsers->training->id]) }}"
+                                                                class="btn btn-outline-primary btn-sm mt-2">
+                                                                <i class="ti ti-book"></i> Isi Evaluasi Instruktur
+                                                            </a>
+                                                        @else
+                                                            <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#noInstrukturModal{{ $trainingUsers->id }}">
+                                                                <i class="ti ti-book"></i> Isi Evaluasi Instruktur
+                                                            </button>
+                                                        @endif
+                                                    </div>
+                                                </div>
+    
+                                                {{-- Modal Evaluasi Instruktur --}}
+                                                <div class="modal fade" id="noInstrukturModal{{ $trainingUsers->id }}"
+                                                    tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content border-0 shadow">
+                                                            <div
+                                                                class="modal-header bg-danger text-white justify-content-center">
+                                                                <h5 class="modal-title text-white text-center w-100">
+                                                                    Evaluasi Instruktur Belum Tersedia
+                                                                </h5>
+                                                                <button type="button" class="btn-close btn-close-white"
+                                                                    data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body text-center">
+                                                                Evaluasi instruktur untuk
+                                                                <strong>{{ $trainingUsers->training->training_name }}</strong>
+                                                                belum tersedia.
+                                                            </div>
+                                                            <div class="modal-footer justify-content-center">
+                                                                <button type="button" class="btn btn-outline-danger"
+                                                                    data-bs-dismiss="modal">Tutup</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
+                                    </div>
+                                </div>
+                            
+                            </div>
+                            {{-- Navigasi Tab Evaluasi --}}
+                        </div>
+
                         <div id="notifikasi" class="tab-content d-none">
                             <h5 class="fw-bold">Notifikasi</h5>
                             <!-- isi notifikasi -->
@@ -506,7 +920,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const links = document.querySelectorAll('.tab-link');
-            const contents = document.querySelectorAll('.tab-content');
+            const contents = document.querySelectorAll('#tab-contents > div');
 
             links.forEach(link => {
                 link.addEventListener('click', function(e) {
@@ -529,5 +943,23 @@
                 });
             });
         });
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.user-time').forEach(function(el) {
+                const time = el.dataset.time;
+                const date = new Date(time);
+                const formatted = date.toLocaleString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                el.textContent = formatted;
+            });
+        });
+
+        function bukaEvaluasi() {
+            document.getElementById('evaluasi').classList.remove('d-none');
+        }
     </script>
 @endpush

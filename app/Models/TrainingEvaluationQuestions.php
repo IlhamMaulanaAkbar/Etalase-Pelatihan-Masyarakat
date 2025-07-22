@@ -24,11 +24,11 @@ class TrainingEvaluationQuestions extends Model
 
     public function answers()
     {
-        return $this->hasMany(TrainingEvaluationAnswers::class, 'training_evaluation_questions_id');
+        return $this->hasMany(TrainingEvaluationAnswers::class, 'teq_id');
     }
 
     public function userAnswers()
     {
-        return $this->hasMany(TrainingEvaluationUsersAnswers::class, 'training_evaluation_questions_id');
+        return $this->hasMany(TrainingEvaluationUsersAnswers::class, 'teq_id');
     }
 }

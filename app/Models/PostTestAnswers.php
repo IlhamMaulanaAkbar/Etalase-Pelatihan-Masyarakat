@@ -21,4 +21,5 @@ class PostTestAnswers extends Model
     {
         return $this->belongsTo(PostTestQuestions::class, 'post_test_questions_id');
     }
+    
 }

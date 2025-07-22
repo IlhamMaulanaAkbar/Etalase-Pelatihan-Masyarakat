@@ -63,7 +63,7 @@
                     <span class="hide-menu">Pengguna</span>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#" aria-expanded="false">
+                    <a class="sidebar-link" href="{{route('internal.users.index')}}" aria-expanded="false">
                         <span><i class="ti ti-users"></i></span>
                         <span class="hide-menu">Total Pengguna</span>
                     </a>
@@ -74,13 +74,13 @@
                     <span class="hide-menu">Evaluasi</span>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#" aria-expanded="false">
+                    <a class="sidebar-link" href="{{route('internal.page.training-evaluation.index')}}" aria-expanded="false">
                         <span><i class="ti ti-graph"></i></span>
                         <span class="hide-menu">Evaluasi Pelatihan</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#" aria-expanded="false">
+                    <a class="sidebar-link" href="{{route('internal.page.instructor-evaluation.index')}}" aria-expanded="false">
                         <span><i class="ti ti-graph"></i></span>
                         <span class="hide-menu">Evaluasi Instruktur</span>
                     </a>

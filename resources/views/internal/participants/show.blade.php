@@ -59,18 +59,19 @@
                                             <td>
                                                 <p class="mb-0 fs-2 fw-normal">{{ $participant->user->name }}</p>
                                             </td>
-                                            <td>
+                                            <td class="text-center">
                                                 <p class="mb-0 fs-2 fw-normal">{{ $participant->pre_test_score ?? 'N/A' }}
                                                 </p>
                                             </td>
-                                            <td>
-                                                <p class="mb-0 fs-2 fw-normal">{{ $participant->pre_post_score ?? 'N/A' }}
+                                            <td class="text-center">
+                                                <p class="mb-0 fs-2 fw-normal">{{ $participant->post_test_score ?? 'N/A' }}
                                                 </p>
                                             </td>
                                             <td>
                                                 @if ($participant->letter_statement)
                                                     <a href="{{ asset('storage/' . $participant->letter_statement) }}"
-                                                        target="_blank" class="btn btn-sm btn-outline-primary w-100">Lihat</a>
+                                                        target="_blank"
+                                                        class="btn btn-sm btn-outline-primary w-100">Lihat</a>
                                                 @else
                                                     <span class="text-muted">Tidak ada</span>
                                                 @endif
@@ -78,7 +79,8 @@
                                             <td>
                                                 @if ($participant->letter_recommendation)
                                                     <a href="{{ asset('storage/' . $participant->letter_recommendation) }}"
-                                                        target="_blank" class="btn btn-sm btn-outline-primary w-100">Lihat</a>
+                                                        target="_blank"
+                                                        class="btn btn-sm btn-outline-primary w-100">Lihat</a>
                                                 @else
                                                     <span class="text-muted">Tidak ada</span>
                                                 @endif
@@ -89,28 +91,35 @@
                                                         class="badge bg-success rounded-pill px-4 py-2 fs-2">Diterima</span>
                                                 @elseif ($participant->status == 'TIDAK_LULUS')
                                                     <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Ditolak</span>
+                                                @elseif ($participant->status == 'BATAL')
+                                                    <span
+                                                        class="badge bg-danger rounded-pill px-4 py-2 fs-2">Dibatalkan oleh Peserta</span>
                                                 @else
                                                     <span
                                                         class="badge bg-warning rounded-pill px-4 py-2 fs-2">Menunggu</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                <form method="POST"
-                                                    action="{{ route('internal.training.participants.status', ['training_user' => $participant->id]) }}">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <select name="status" class="form-select form-select-sm w-auto">
-                                                            <option value="LULUS"
-                                                                {{ $participant->status === 'LULUS' ? 'selected' : '' }}>
-                                                                DITERIMA</option>
-                                                            <option value="TIDAK_LULUS"
-                                                                {{ $participant->status === 'TIDAK_LULUS' ? 'selected' : '' }}>
-                                                                DITOLAK</option>
-                                                        </select>
-                                                        <button class="btn btn-sm btn-success">Update</button>
-                                                    </div>
-                                                </form>
+                                                @if ($participant->status === 'DAFTAR')
+                                                    <form method="POST"
+                                                        action="{{ route('internal.training.participants.status', ['training_user' => $participant->id]) }}">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <select name="status"
+                                                                class="form-select form-select-sm w-auto">
+                                                                <option value="" disabled selected>Pilih Status
+                                                                </option>
+                                                                <option value="LULUS">TERIMA</option>
+                                                                <option value="TIDAK_LULUS">TOLAK</option>
+                                                            </select>
+                                                            <button type="submit"
+                                                                class="btn btn-sm btn-success">Update</button>
+                                                        </div>
+                                                    </form>
+                                                @else
+                                                    <span class="text-muted small">Status telah diproses</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 @if ($participant->verified_at)
@@ -250,3 +259,24 @@
         </section>
     </main>
 @endsection
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selects = document.querySelectorAll('.status-select');
+
+            selects.forEach(function(select) {
+                const initialValue = select.dataset.initial;
+                const button = select.closest('form').querySelector('.update-btn');
+
+                // Tampilkan tombol jika terjadi perubahan
+                select.addEventListener('change', function() {
+                    if (select.value !== initialValue) {
+                        button.classList.remove('d-none');
+                    } else {
+                        button.classList.add('d-none');
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

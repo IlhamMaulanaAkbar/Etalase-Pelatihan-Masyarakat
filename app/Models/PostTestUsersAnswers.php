@@ -26,4 +26,9 @@ class PostTestUsersAnswers extends Model
     {
         return $this->belongsTo(User::class, 'users_id');
     }
+
+    public function answer()
+    {
+        return $this->belongsTo(PostTestAnswers::class, 'answer');
+    }
 }

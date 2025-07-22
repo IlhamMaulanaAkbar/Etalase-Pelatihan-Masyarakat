@@ -274,7 +274,11 @@
                                                 Anda Diterima
                                             </button>
                                         @break
-
+                                        @case('BATAL')
+                                            <button class="btn btn-danger w-100 rounded-pill fw-bold py-2" disabled>
+                                                Anda Telah Membatalkan Pendaftaran
+                                            </button>
+                                        @break
                                         @case('TIDAK_LULUS')
                                             <button class="btn btn-danger w-100 rounded-pill fw-bold py-2" disabled>
                                                 Anda Tidak Diterima

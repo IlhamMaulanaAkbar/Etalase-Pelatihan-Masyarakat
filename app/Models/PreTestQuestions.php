@@ -33,4 +33,5 @@ class PreTestQuestions extends Model
     {
         return $this->hasMany(PreTestUsersAnswers::class, 'pre_test_questions_id');
     }
+    
 }

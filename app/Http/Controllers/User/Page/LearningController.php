@@ -10,13 +10,19 @@ use App\Services\Supports\Youtube;
 
 class LearningController extends Controller
 {
-    public function index()
+    public function index(Learning $learning, Request $request)
     {
         $youtube = new Youtube();
 
         // Default: hanya tampilkan umum & pengumuman
         $learnings = Learning::whereIn('type', ['umum', 'pengumuman'])->latest()->paginate(9);
 
+        $sessionKey = 'viewed_learnings_' . $learning->id;
+
+        if (!session()->has($sessionKey)) {
+            $learning->increment('views');
+            session()->put($sessionKey, true);
+        }
         // Kategori per-type
         $umum = Learning::where('type', 'umum')->latest()->get();
         $pengumuman = Learning::where('type', 'pengumuman')->latest()->get();

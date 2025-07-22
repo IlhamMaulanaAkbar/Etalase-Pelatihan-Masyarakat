@@ -30,6 +30,7 @@
         </div> <!-- .body-wrapper -->
     </div> <!-- .page-wrapper -->
     @include('layouts.partials.footer-internal')
+    @stack('scripts')
 </body>
 
 </html>

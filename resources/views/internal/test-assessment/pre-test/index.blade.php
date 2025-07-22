@@ -16,7 +16,7 @@
                         <h5 class="card-title fw-semibold mb-4">Halaman Pre-Test</h5>
 
                         {{-- Tombol Tambah Pertanyaan --}}
-                        <div class="border border-2 border-dashed rounded p-4 mb-4 text-center">
+                        <div class="rounded p-4 mb-4 text-center" style="border-style: dashed; border-color: #000; border-width: 2px;">
                             <a href="{{ route('internal.test-assessment.pre-test.create', ['training' => $training->id]) }}"
                                 class="text-decoration-none text-dark fw-semibold d-inline-flex align-items-center gap-2">
                                 <i class="ti ti-calendar-plus fs-4"></i> Pertanyaan Baru

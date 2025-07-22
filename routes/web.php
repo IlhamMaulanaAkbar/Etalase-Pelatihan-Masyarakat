@@ -13,3 +13,6 @@ Route::get('/run-schedule/{token}', function ($token) {
     Artisan::call('schedule:run');
     return 'Schedule dijalankan pada ' . now();
 });
+Route::get('/keep-alive', function () {
+    return response()->noContent(); // 204 No Content
+});

@@ -12,12 +12,12 @@ class TrainingEvaluationAnswers extends Model
     protected $table = 'training_evaluation_answers';
 
     protected $fillable = [
-        'training_evaluation_questions_id',
-        'answer',
+        'teq_id',
+        'answers',
     ];
 
     public function question()
     {
-        return $this->belongsTo(TrainingEvaluationQuestions::class, 'training_evaluation_questions_id');
+        return $this->belongsTo(TrainingEvaluationQuestions::class, 'teq_id');
     }
 }

@@ -76,6 +76,14 @@ class TrainingController extends Controller
             ]);
         }
 
+        // Gunakan session untuk mencegah duplikat hit dari user yang sama
+        $sessionKey = 'viewed_training_' . $training->id;
+
+        if (!session()->has($sessionKey)) {
+            $training->increment('views');
+            session()->put($sessionKey, true);
+        }
+
         return view('public.training.show', compact('training', 'user', 'acceptedParticipants'));
     }
 
@@ -121,20 +129,10 @@ class TrainingController extends Controller
     }
     public function destroy(TrainingUser $trainingUser)
     {
-        // Hapus file surat pernyataan
-        if ($trainingUser->letter_statement && Storage::disk('public')->exists($trainingUser->letter_statement)) {
-            Storage::disk('public')->delete($trainingUser->letter_statement);
-        }
+        $trainingUser->status = 'BATAL';
+        $trainingUser->save();
 
-        // Hapus file surat rekomendasi
-        if ($trainingUser->letter_recommendation && Storage::disk('public')->exists($trainingUser->letter_recommendation)) {
-            Storage::disk('public')->delete($trainingUser->letter_recommendation);
-        }
-
-        // Hapus data pendaftaran
-        $trainingUser->delete();
-
-        return back()->with(Alert::success('Berhasil membatalkan pendaftaran pelatihan.'));
+        return redirect()->back()->with('success', 'Pendaftaran berhasil dibatalkan.');
     }
 
     public function success(Training $training)

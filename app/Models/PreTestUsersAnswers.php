@@ -26,4 +26,10 @@ class PreTestUsersAnswers extends Model
     {
         return $this->belongsTo(User::class, 'users_id');
     }
+
+    public function answer()
+    {
+        return $this->belongsTo(PreTestAnswers::class, 'answer');
+    }
+    
 }

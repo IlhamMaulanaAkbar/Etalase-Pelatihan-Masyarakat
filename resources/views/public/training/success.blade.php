@@ -21,7 +21,8 @@
                 <p class="text-muted mb-0">Pindah menuju halaman Test Asesmen dalam</p>
                 <p class="fw-semibold">
                     <span id="countdown">01:00</span> atau
-                    <a id="startTestLink" href=""
+                    <a id="startTestLink"
+                        href="{{ route('public.test-assessment.pre-test.start', ['training' => $training->id]) }}"
                         class="text-decoration-none text-primary fw-semibold">
                         Kerjakan Test Asesmen Sekarang
                     </a>
@@ -54,7 +55,8 @@
                 if (seconds <= 0) {
                     clearInterval(timer);
                     if (!linkClicked) {
-                        window.location.href = "{{ route('public.training.show', ['training' => $training->id]) }}";
+                        window.location.href =
+                            "{{ route('public.training.show', ['training' => $training->id]) }}";
                     }
                 }
             }, 1000);

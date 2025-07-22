@@ -54,8 +54,8 @@
                                     <li>
                                         <a class="dropdown-item" href="{{route('internal.test-assessment.post-test.index', ['training' => $training->id])}}">Post Test</a>
                                     </li>
-                                    <li><a class="dropdown-item" href="javascript:void(0)">Evaluasi Pelatihan</a></li>
-                                    <li><a class="dropdown-item" href="javascript:void(0)">Evaluasi Instruktur</a></li>
+                                    <li><a class="dropdown-item" href="{{route('internal.evaluations.training-evaluation.index', ['training' => $training->id])}}">Evaluasi Pelatihan</a></li>
+                                    <li><a class="dropdown-item" href="{{route('internal.evaluations.instructor-evaluation.index', ['training' => $training->id])}}">Evaluasi Instruktur</a></li>
                                 </ul>
                             </div>
                         </div>

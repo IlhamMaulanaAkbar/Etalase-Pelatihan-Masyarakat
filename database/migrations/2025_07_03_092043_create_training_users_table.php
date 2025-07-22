@@ -23,6 +23,10 @@ return new class extends Migration
             $table->boolean('is_approved')->default(false);
             $table->string('letter_recommendation')->nullable();
             $table->string('letter_statement')->nullable();
+            $table->boolean('started_pretest')->default(false);
+            $table->boolean('started_posttest')->default(false);
+            $table->boolean('started_training_evaluation')->default(false);
+            $table->boolean('started_instructor_evaluation')->default(false);
             $table->timestamp('verified_at')->nullable();
             $table->timestamps();
         });
