@@ -17,7 +17,7 @@ class TrainingParticipantController extends Controller
     public function index()
     {
         $trainings = Training::withCount('training_users')->get()->sortByDesc('created_at');
-        return view('internal.participants.index', compact('trainings'));
+        return view('internal.participants.training.index', compact('trainings'));
     }
 
     public function show(Training $training)
@@ -83,7 +83,7 @@ class TrainingParticipantController extends Controller
             }
         }
 
-        return view('internal.participants.show', compact('training', 'participants'));
+        return view('internal.participants.training.show', compact('training', 'participants'));
     }
 
 

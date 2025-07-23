@@ -4,7 +4,7 @@
     <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
             <a href="{{ route('internal.home.dashboard.index') }}" class="text-nowrap logo-img ">
-                <img src="{{asset('assets/images/logos/2.png')}}" width="180" alt="logo" />
+                <img src="{{ asset('assets/images/logos/2.png') }}" width="180" alt="logo" />
             </a>
             <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
                 <i class="ti ti-x fs-8"></i>
@@ -29,25 +29,26 @@
                     <span class="hide-menu">Halaman</span>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ route('internal.training.index')}}" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.training.index') }}" aria-expanded="false">
                         <span><i class="ti ti-chalkboard"></i></span>
                         <span class="hide-menu">Pelatihan</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.assistance.index') }}" aria-expanded="false">
                         <span><i class="ti ti-chalkboard"></i></span>
                         <span class="hide-menu">Pendampingan</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{route('internal.training.participants.index')}}" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.training.participants.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-user-search"></i></span>
                         <span class="hide-menu">Peserta Pelatihan</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#" aria-expanded="false">
+                    <a class="sidebar-link" href="{{route('internal.assistance.participants.index')}}" aria-expanded="false">
                         <span><i class="ti ti-user-search"></i></span>
                         <span class="hide-menu">Peserta Pendampingan</span>
                     </a>
@@ -63,7 +64,7 @@
                     <span class="hide-menu">Pengguna</span>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{route('internal.users.index')}}" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.users.index') }}" aria-expanded="false">
                         <span><i class="ti ti-users"></i></span>
                         <span class="hide-menu">Total Pengguna</span>
                     </a>
@@ -74,13 +75,15 @@
                     <span class="hide-menu">Evaluasi</span>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{route('internal.page.training-evaluation.index')}}" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.page.training-evaluation.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-graph"></i></span>
                         <span class="hide-menu">Evaluasi Pelatihan</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{route('internal.page.instructor-evaluation.index')}}" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.page.instructor-evaluation.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-graph"></i></span>
                         <span class="hide-menu">Evaluasi Instruktur</span>
                     </a>

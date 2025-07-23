@@ -14,7 +14,8 @@ use App\Http\Controllers\Internal\Page\UsersController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Internal\Page\TrainingEvaluationController as EvaluationTrainingController;
 use App\Http\Controllers\Internal\Page\InstructorEvaluationController as EvaluationInstructorController;
-
+use App\Http\Controllers\Internal\Page\AssistanceController;
+use App\Http\Controllers\Internal\Page\AssistanceParticipantController;
 
 
 Route::prefix('internal')->group(function () {
@@ -45,9 +46,20 @@ Route::prefix('internal')->group(function () {
         Route::get('/training/{training}', [TrainingController::class, 'show'])->name('internal.training.show');
         Route::delete('/training/{training}', [TrainingController::class, 'destroy'])->name('internal.training.destroy');
 
+        Route::get('/assistance', [AssistanceController::class, 'index'])->name('internal.assistance.index');
+        Route::get('/assistance/create', [AssistanceController::class, 'create'])->name('internal.assistance.create');
+        Route::post('/assistance', [AssistanceController::class, 'store'])->name('internal.assistance.store');
+        Route::get('/assistance/{assistance}/edit', [AssistanceController::class, 'edit'])->name('internal.assistance.edit');
+        Route::put('/assistance/{assistance}', [AssistanceController::class, 'update'])->name('internal.assistance.update');
+        Route::get('/assistance/{assistance}', [AssistanceController::class, 'show'])->name('internal.assistance.show');
+        Route::delete('/assistance/{assistance}', [AssistanceController::class, 'destroy'])->name('internal.assistance.destroy');
+
         Route::get('/training-participants', [TrainingParticipantController::class, 'index'])->name('internal.training.participants.index');
         Route::get('/training-participants/{training}', [TrainingParticipantController::class, 'show'])->name('internal.training.participants.show');
         Route::put('/training-participants/{training_user}', [TrainingParticipantController::class, 'status'])->name('internal.training.participants.status');
+
+        Route::get('/assistance-participants', [AssistanceParticipantController::class, 'index'])->name('internal.assistance.participants.index');
+        Route::get('/assistance-participants/{assistance}', [AssistanceParticipantController::class, 'show'])->name('internal.assistance.participants.show');
 
         Route::get('/evaluations/training-evaluations', [EvaluationTrainingController::class, 'index'])->name('internal.page.training-evaluation.index');
         Route::get('/evaluations/training-evaluations/{training}', [EvaluationTrainingController::class, 'show'])->name('internal.page.training-evaluation.show');

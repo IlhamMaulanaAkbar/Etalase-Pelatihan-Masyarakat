@@ -14,12 +14,14 @@ use App\Http\Controllers\User\Evaluations\InstructorEvaluationController as Eval
 use App\Http\Controllers\User\TestAssessment\PreTestController;
 use App\Http\Controllers\User\TestAssessment\PostTestController;
 use App\Http\Controllers\User\Evaluations\TrainingEvaluationController;
-
+use App\Http\Controllers\User\Page\AssistanceController;
 
 
 Route::get('/', [DashboardController::class, 'index'])->name('public.home.dashboard.index');
 Route::get('/training', [TrainingController::class, 'index'])->name('public.training.index');
 Route::get('/training/{training}', [TrainingController::class, 'show'])->name('public.training.show');
+Route::get('/assistance', [AssistanceController::class, 'index'])->name('public.assistance.index');
+Route::get('/assistance/{assistance}', [AssistanceController::class, 'show'])->name('public.assistance.show');
 Route::get('/about', [AboutController::class, 'index'])->name('public.about.index');
 Route::get('/contact', [ContactController::class, 'index'])->name('public.contact.index');
 Route::get('/learning', [LearningController::class, 'index'])->name('public.learning.index');
