@@ -48,7 +48,8 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{route('internal.assistance.participants.index')}}" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.assistance.participants.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-user-search"></i></span>
                         <span class="hide-menu">Peserta Pendampingan</span>
                     </a>
@@ -93,49 +94,58 @@
                     <span class="hide-menu">Laporan</span>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="#" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.report.training-report.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-file-analytics"></i></span>
                         <span class="hide-menu">Laporan Pelatihan</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="?page=insentif_read" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.report.assistance-report.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-file-analytics"></i></span>
                         <span class="hide-menu">Laporan Pendampingan</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="?page=insentif_read" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.report.training-participants-report.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-file-analytics"></i></span>
                         <span class="hide-menu text-wrap">Laporan Peserta Pelatihan</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="?page=insentif_read" aria-expanded="false">
+                    <a class="sidebar-link"
+                        href="{{ route('internal.report.assistance-participants-report.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-file-analytics"></i></span>
                         <span class="hide-menu text-wrap">Laporan Peserta Pendampingan</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="?page=insentif_read" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.report.users-report.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-file-analytics"></i></span>
                         <span class="hide-menu">Laporan Total Pengguna</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="?page=insentif_read" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.report.training-evaluations-report.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-file-analytics"></i></span>
                         <span class="hide-menu text-wrap">Laporan Evaluasi Pelatihan</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="?page=insentif_read" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.report.instructor-evaluations-report.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-file-analytics"></i></span>
-                        <span class="hide-menu text-wrap">Laporan Evaluasi Pendampingan</span>
+                        <span class="hide-menu text-wrap">Laporan Evaluasi Instruktur</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="?page=insentif_read" aria-expanded="false">
+                    <a class="sidebar-link" href="{{ route('internal.report.learning-report.index') }}"
+                        aria-expanded="false">
                         <span><i class="ti ti-file-analytics"></i></span>
                         <span class="hide-menu text-wrap">Laporan Video Pembelajaran</span>
                     </a>

@@ -3,11 +3,21 @@
 @section('content')
     <section class="py-5 bg-light-primary">
         <div class="container py-3">
-            <h1 class="fw-bolder mb-7">Rencanakan dan pilih jadwal pendampingan yang tepat untuk kebutuhan Anda.</h1>
+            <h1 class="fw-bolder mb-7">Rencanakan dan pilih jadwal pendampingan sesuai dengan kebutuhan pengembangan kompetensi Anda.</h1>
 
             {{-- Filter Section --}}
             <form action="{{ route('public.assistance.index') }}" method="GET">
-                <div class="row g-2 d-flex align-items-end mb-4">
+                <div class="row g-2 d-flex align-items-end justify-content-center mb-4">
+
+                    <div class="col-md-3">
+                        <label class="form-label">Urutkan Berdasarkan</label>
+                        <select name="sort" class="form-select border-2" onchange="this.form.submit()">
+                            <option value="" @selected(request('sort') == '')>Semua Urutan</option>
+                            <option value="latest" @selected(request('sort') == 'latest')>Terbaru</option>
+                            <option value="oldest" @selected(request('sort') == 'oldest')>Terlama</option>
+                            <option value="az" @selected(request('sort') == 'az')>A-Z</option>
+                        </select>
+                    </div>
 
                     {{-- Lokasi / Status --}}
                     <div class="col-md-2">
@@ -30,8 +40,8 @@
                     {{-- Kata Kunci --}}
                     <div class="col-md-3">
                         <label class="form-label">Telusuri Pendampingan</label>
-                        <input type="text" name="keyword" class="form-control border-2" placeholder="Cari Pendampingan..."
-                            value="{{ request('keyword') }}">
+                        <input type="text" name="keyword" class="form-control border-2"
+                            placeholder="Cari Pendampingan..." value="{{ request('keyword') }}">
                     </div>
 
                     {{-- Tombol Cari --}}

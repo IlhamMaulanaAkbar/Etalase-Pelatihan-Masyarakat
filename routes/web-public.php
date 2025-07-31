@@ -43,6 +43,9 @@ Route::middleware(['auth:user'])->group(function () {
     Route::post('/training/{training}/register', [TrainingController::class, 'register'])->name('public.training.register');
     Route::get('/training/{training}/success', [TrainingController::class, 'success'])->name('public.training.success');
     Route::delete('/training/{training_user}', [TrainingController::class, 'destroy'])->name('public.training.destroy');
+    Route::post('/assistance/{assistance}/register', [AssistanceController::class, 'register'])->name('public.assistance.register');
+    Route::get('/assistance/{assistance}/success', [AssistanceController::class, 'success'])->name('public.assistance.success');
+    Route::delete('/assistance/{assistance_user}', [AssistanceController::class, 'destroy'])->name('public.assistance.destroy');
 
     Route::prefix('training/{training}/test-assessment')->group(function () {
         Route::get('/pre-test/start', [PreTestController::class, 'start'])->name('public.test-assessment.pre-test.start');

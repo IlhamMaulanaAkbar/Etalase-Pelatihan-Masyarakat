@@ -24,16 +24,10 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="dropdown-item d-flex align-items-center gap-3"
-                                        onclick="event.preventDefault(); document.getElementById('delete-form-{{ $training->id }}').submit();">
-                                        <i class="fs-4 ti ti-trash"></i> Delete
+                                    <a href="javascript:void(0)" class="dropdown-item d-flex align-items-center gap-3"
+                                        data-bs-toggle="modal" data-bs-target="#deleteTrainingModal{{ $training->id }}">
+                                        <i class="fs-4 ti ti-trash"></i> Hapus
                                     </a>
-                                    <form id="delete-form-{{ $training->id }}"
-                                        action="{{ route('internal.training.destroy', $training) }}" method="POST"
-                                        style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
                                 </li>
                             </ul>
                         </div>
@@ -49,13 +43,26 @@
                                 <ul class="dropdown-menu animated flipInX">
                                     <li>
                                         <a class="dropdown-item"
-                                            href="{{ route('internal.test-assessment.pre-test.index', ['training' => $training->id]) }}">Pre Test</a>
+                                            href="{{ route('internal.test-assessment.pre-test.index', ['training' => $training->id]) }}">Pre
+                                            Test</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="{{route('internal.test-assessment.post-test.index', ['training' => $training->id])}}">Post Test</a>
+                                        <a class="dropdown-item"
+                                            href="{{ route('internal.test-assessment.post-test.index', ['training' => $training->id]) }}">Post
+                                            Test</a>
                                     </li>
-                                    <li><a class="dropdown-item" href="{{route('internal.evaluations.training-evaluation.index', ['training' => $training->id])}}">Evaluasi Pelatihan</a></li>
-                                    <li><a class="dropdown-item" href="{{route('internal.evaluations.instructor-evaluation.index', ['training' => $training->id])}}">Evaluasi Instruktur</a></li>
+                                    <li><a class="dropdown-item"
+                                            href="{{ route('internal.evaluations.training-evaluation.index', ['training' => $training->id]) }}">Evaluasi
+                                            Pelatihan</a></li>
+                                    <li><a class="dropdown-item"
+                                            href="{{ route('internal.evaluations.instructor-evaluation.index', ['training' => $training->id]) }}">Evaluasi
+                                            Instruktur</a></li>
+                                    <li><a class="dropdown-item"
+                                            href="{{ route('internal.lessons.training.index', ['training' => $training->id]) }}">Materi
+                                            Pelatihan</a></li>
+                                    <li><a class="dropdown-item"
+                                            href="{{ route('internal.certificates.index', ['training' => $training->id]) }}">Sertifikat
+                                            Pelatihan</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -118,6 +125,34 @@
                                     <div>{!! $training->description !!}</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Konfirmasi Hapus -->
+            <div class="modal fade" id="deleteTrainingModal{{ $training->id }}" tabindex="-1"
+                aria-labelledby="deleteTrainingModalLabel{{ $training->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary">
+                            <h5 class="modal-title w-100 text-center text-white" id="deleteTrainingModalLabel{{ $training->id }}">
+                                Konfirmasi Hapus
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Tutup"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            Apakah Anda yakin ingin menghapus pelatihan ini?
+                            <br><strong>"{{ $training->training_name }}"</strong>
+                        </div>
+                        <div class="modal-footer justify-content-end">
+                            <form id="delete-form-{{ $training->id }}"
+                                action="{{ route('internal.training.destroy', $training) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+                            </form>
                         </div>
                     </div>
                 </div>

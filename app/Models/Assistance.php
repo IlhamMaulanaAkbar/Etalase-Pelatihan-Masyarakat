@@ -44,4 +44,9 @@ class Assistance extends Model
     {
         return $this->hasMany(AssistanceUser::class, 'assistance_id');
     }
+
+    public function lessonsAssistance()
+    {
+        return $this->hasMany(LessonsAssistance::class, 'assistance_id');
+    }
 }

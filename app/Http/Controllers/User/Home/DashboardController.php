@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User\Home;
 
 use App\Http\Controllers\Controller;
+use App\Models\Assistance;
 use App\Models\Learning;
 use Illuminate\Http\Request;
 use App\Models\Training;
@@ -20,6 +21,7 @@ class DashboardController extends Controller
         $totalTrainings = Training::count();
         $totalLearnings = Learning::count();
         $totalUsers = User::where('role', 'user')->count();
+        $totalAssistances = Assistance::count();
 
         $categorys = Category::select('id', 'name')->get();
         return view('public.home.dashboard.index', [
@@ -28,6 +30,7 @@ class DashboardController extends Controller
             'totalTrainings' => $totalTrainings,
             'totalLearnings' => $totalLearnings,
             'totalUsers' => $totalUsers,
+            'totalAssistances' => $totalAssistances,
         ]);
     }
 }

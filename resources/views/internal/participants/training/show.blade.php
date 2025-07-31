@@ -92,8 +92,8 @@
                                                 @elseif ($participant->status == 'TIDAK_LULUS')
                                                     <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Ditolak</span>
                                                 @elseif ($participant->status == 'BATAL')
-                                                    <span
-                                                        class="badge bg-danger rounded-pill px-4 py-2 fs-2">Dibatalkan oleh Peserta</span>
+                                                    <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Dibatalkan
+                                                        oleh Peserta</span>
                                                 @else
                                                     <span
                                                         class="badge bg-warning rounded-pill px-4 py-2 fs-2">Menunggu</span>
@@ -276,6 +276,20 @@
                         button.classList.add('d-none');
                     }
                 });
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.user-time').forEach(function(el) {
+                const time = el.dataset.time;
+                const date = new Date(time);
+                const formatted = date.toLocaleString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                el.textContent = formatted;
             });
         });
     </script>

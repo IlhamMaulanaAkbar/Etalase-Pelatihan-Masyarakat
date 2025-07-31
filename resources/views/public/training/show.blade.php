@@ -73,7 +73,7 @@
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="silabus-tab" data-bs-toggle="tab" data-bs-target="#silabus"
-                                type="button" role="tab">Silabus</button>
+                                type="button" role="tab">Materi Pelatihan</button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="peserta-tab" data-bs-toggle="tab" data-bs-target="#peserta"
@@ -125,7 +125,64 @@
                         </div>
 
                         <div class="tab-pane fade" id="silabus" role="tabpanel">
-                            <p>Silabus akan ditampilkan di sini.</p>
+                            <div class="container">
+                                {{-- @php
+                                    $isAllowed = \App\Models\TrainingUser::where('training_id', $training->id)
+                                        ->where('user_id', optional($user)->id)
+                                        ->where('status', 'LULUS')
+                                        ->exists();
+                                @endphp --}}
+
+                                {{-- @if ($isAllowed) --}}
+                                    <p class="fw-semibold text-black mb-4">Materi Pelatihan ({{ $totalJp }} JP)</p>
+
+                                    <div class="position-relative ms-4">
+                                        @if ($lessons->count() > 1)
+                                            <!-- Garis vertikal hanya jika ada lebih dari 1 lesson -->
+                                            <div class="position-absolute top-0 start-0 border-start border-2 border-light"
+                                                style="height: 100%; left: 0.5rem;"></div>
+                                        @endif
+
+                                        @foreach ($lessons as $lesson)
+                                            <!-- Item Materi -->
+                                            <div class="d-flex position-relative mb-3">
+                                                <!-- Titik (dot) -->
+                                                <div class="bg-primary rounded-circle position-absolute"
+                                                    style="width: 12px; height: 12px; left: -0.3rem; top: 0.4rem;">
+                                                </div>
+
+                                                <!-- Card -->
+                                                <div class="card w-100 ms-4">
+                                                    <div class="card-body">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <h6 class="fw-bold mb-2">{{ $lesson->name }}</h6>
+                                                                <div class="text-muted small">
+                                                                    <i class="bi bi-clock"></i> {{ $lesson->duration }} JP
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                @if ($lesson->file)
+                                                                    <a href="{{ asset('storage/' . $lesson->file) }}"
+                                                                        target="_blank"
+                                                                        class="btn btn-sm btn-outline-primary">
+                                                                        <i class="bi bi-file-earmark-text"></i> Lihat File
+                                                                    </a>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                {{-- @else
+                                    <div class="text-center py-5">
+                                        <p class="text-muted fs-5">Anda harus <span class="fw-semibold text-dark">mendaftar
+                                                dan lulus pelatihan</span> untuk dapat melihat materi pelatihan.</p>
+                                    </div>
+                                @endif --}}
+                            </div>
                         </div>
 
                         <div class="tab-pane fade" id="peserta" role="tabpanel">
@@ -151,7 +208,8 @@
                             </p>
 
                             <form id="formPendaftaran" method="POST"
-                                action="{{ route('public.training.register', $training) }}" enctype="multipart/form-data">
+                                action="{{ route('public.training.register', $training) }}"
+                                enctype="multipart/form-data">
                                 @csrf
 
                                 <div class="mb-3">
@@ -274,11 +332,13 @@
                                                 Anda Diterima
                                             </button>
                                         @break
+
                                         @case('BATAL')
                                             <button class="btn btn-danger w-100 rounded-pill fw-bold py-2" disabled>
                                                 Anda Telah Membatalkan Pendaftaran
                                             </button>
                                         @break
+
                                         @case('TIDAK_LULUS')
                                             <button class="btn btn-danger w-100 rounded-pill fw-bold py-2" disabled>
                                                 Anda Tidak Diterima

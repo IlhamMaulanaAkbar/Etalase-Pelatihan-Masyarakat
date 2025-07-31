@@ -54,8 +54,8 @@
                                                 @elseif ($participant->status == 'TIDAK_LULUS')
                                                     <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Ditolak</span>
                                                 @elseif ($participant->status == 'BATAL')
-                                                    <span
-                                                        class="badge bg-danger rounded-pill px-4 py-2 fs-2">Dibatalkan oleh Peserta</span>
+                                                    <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Dibatalkan
+                                                        oleh Peserta</span>
                                                 @else
                                                     <span
                                                         class="badge bg-warning rounded-pill px-4 py-2 fs-2">Menunggu</span>
@@ -64,7 +64,7 @@
                                             <td>
                                                 @if ($participant->status === 'DAFTAR')
                                                     <form method="POST"
-                                                        action="{{ route('internal.training.participants.status', ['training_user' => $participant->id]) }}">
+                                                        action="{{ route('internal.assistance.participants.status', ['assistance_user' => $participant->id]) }}">
                                                         @csrf
                                                         @method('PUT')
                                                         <div class="d-flex align-items-center gap-2">
@@ -85,8 +85,7 @@
                                             </td>
                                             <td>
                                                 @if ($participant->verified_at)
-                                                    <p class="mb-0 fs-2 fw-normal">
-                                                        {{ $participant->verified_at->format('d M Y H:i') }}
+                                                    <p class="mb-0 fs-2 fw-normal user-time" data-time="{{ $participant->verified_at }}">
                                                     </p>
                                                 @else
                                                     <p class="text-muted mb-0 fs-2 fw-normal">Belum diverifikasi</p>
@@ -238,6 +237,20 @@
                         button.classList.add('d-none');
                     }
                 });
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.user-time').forEach(function(el) {
+                const time = el.dataset.time;
+                const date = new Date(time);
+                const formatted = date.toLocaleString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                el.textContent = formatted;
             });
         });
     </script>

@@ -89,11 +89,11 @@
                                             </td>
                                             <td class="text-center">
                                                 <p class="mb-0 fs-2 fw-normal">
-                                                    -
+                                                    {{ $item->assistance_users->count() }} Pendampingan
                                                 </p>
                                             </td>
-                                            <td>
-                                                <a href="#" class="btn btn-outline-primary btn-sm">Detail</a>
+                                            <td class="text-center">
+                                                <a href="#" class="btn btn-outline-danger btn-sm"><i class="ti ti-trash"></i></a>
                                             </td>
                                         </tr>
                                     @endforeach

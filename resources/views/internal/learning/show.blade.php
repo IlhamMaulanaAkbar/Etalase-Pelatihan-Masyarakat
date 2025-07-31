@@ -24,16 +24,10 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="dropdown-item d-flex align-items-center gap-3"
-                                        onclick="event.preventDefault(); document.getElementById('delete-form-{{ $learning->id }}').submit();">
-                                        <i class="fs-4 ti ti-trash"></i> Delete
+                                    <a href="javascript:void(0)" class="dropdown-item d-flex align-items-center gap-3"
+                                        data-bs-toggle="modal" data-bs-target="#deleteLearningModal{{ $learning->id }}">
+                                        <i class="fs-4 ti ti-trash"></i> Hapus
                                     </a>
-                                    <form id="delete-form-{{ $learning->id }}"
-                                        action="{{ route('internal.learning.destroy', $learning) }}" method="POST"
-                                        style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
                                 </li>
                             </ul>
                         </div>
@@ -65,6 +59,33 @@
                                 target="_blank">
                                 {{ $learning->video_url }}
                             </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Konfirmasi Hapus Video Pembelajaran -->
+            <div class="modal fade" id="deleteLearningModal{{ $learning->id }}" tabindex="-1"
+                aria-labelledby="deleteLearningModalLabel{{ $learning->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary">
+                            <h5 class="modal-title w-100 text-center text-white" id="deleteLearningModalLabel{{ $learning->id }}">
+                                Konfirmasi Hapus
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Tutup"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            Apakah Anda yakin ingin menghapus video pembelajaran ini?
+                            <br><strong>"{{ $learning->video_name }}"</strong>
+                        </div>
+                        <div class="modal-footer justify-content-end">
+                            <form action="{{ route('internal.learning.destroy', $learning) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+                            </form>
                         </div>
                     </div>
                 </div>

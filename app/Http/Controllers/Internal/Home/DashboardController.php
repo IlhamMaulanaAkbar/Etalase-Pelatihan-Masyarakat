@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Internal\Home;
 
 use App\Http\Controllers\Controller;
+use App\Models\Assistance;
 use App\Models\Training;
 use Illuminate\Support\Facades\DB;
 use App\Models\PreTestAnswers;
@@ -22,25 +23,38 @@ class DashboardController extends Controller
         $totalTrainings = Training::count();
         $totalParticipants = User::where('role', 'user')->count();
         $totalVideos = Learning::count();
-        // Training Registration Statistics
-        // $trainings = Training::withCount('participants')
-        // ->orderBy('')
-        // ->get();
+        $totalAssistances = Assistance::count();
 
-        // $trainingRegistrationData = [
-        //     'labels' => $trainings->pluck('training_name'),
-        //     'data' => $trainings->pluck('participants_count')
-        // ];
-
-        $registrationsByDate = DB::table('training_users') // asumsi tabel pivot bernama 'training_user'
+        // Ambil data pendaftar pelatihan
+        $trainingRegistrations = DB::table('training_users')
             ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as total'))
             ->groupBy('date')
-            ->orderBy('date')
-            ->get();
+            ->get()
+            ->keyBy('date');
+
+        // Ambil data pendaftar pendampingan
+        $assistanceRegistrations = DB::table('assistance_users')
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as total'))
+            ->groupBy('date')
+            ->get()
+            ->keyBy('date');
+
+        // Gabungkan tanggal-tanggal dari kedua sumber
+        $allDates = $trainingRegistrations->keys()->merge($assistanceRegistrations->keys())->unique()->sort();
+
+        // Gabungkan data berdasarkan tanggal
+        $combinedData = $allDates->map(function ($date) use ($trainingRegistrations, $assistanceRegistrations) {
+            return [
+                'date' => $date,
+                'training' => $trainingRegistrations[$date]->total ?? 0,
+                'assistance' => $assistanceRegistrations[$date]->total ?? 0,
+            ];
+        });
 
         $trainingRegistrationData = [
-            'labels' => $registrationsByDate->pluck('date'),
-            'data' => $registrationsByDate->pluck('total')
+            'labels' => $combinedData->pluck('date'),
+            'training' => $combinedData->pluck('training'),
+            'assistance' => $combinedData->pluck('assistance'),
         ];
 
         // Pre-Test Statistics
@@ -110,7 +124,8 @@ class DashboardController extends Controller
         ), [
             'totalTrainings' => $totalTrainings,
             'totalParticipants' => $totalParticipants,
-            'totalVideos' => $totalVideos
+            'totalVideos' => $totalVideos,
+            'totalAssistances' => $totalAssistances,
         ]);
     }
 }

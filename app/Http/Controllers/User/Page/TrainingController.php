@@ -65,6 +65,12 @@ class TrainingController extends Controller
 
         $training->load('category'); // tidak perlu eager-load semua
 
+        $lessons = $training->lessonsTraining()
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalJp = $lessons->sum('duration');
+
         $acceptedParticipants = TrainingUser::with('user')
             ->where('training_id', $training->id)
             ->where('status', 'LULUS')
@@ -84,7 +90,7 @@ class TrainingController extends Controller
             session()->put($sessionKey, true);
         }
 
-        return view('public.training.show', compact('training', 'user', 'acceptedParticipants'));
+        return view('public.training.show', compact('training', 'user', 'acceptedParticipants', 'lessons', 'totalJp'));
     }
 
     public function register(Request $request, Training $training)
@@ -110,7 +116,7 @@ class TrainingController extends Controller
         // Buat no registrasi
         $training_id_padded = str_pad($training->id, 8, '1', STR_PAD_LEFT);
         $user_id_padded = str_pad($user->id, 4, '0', STR_PAD_LEFT);
-        $no_reg = 'UID-' . $training_id_padded . '-' . $user_id_padded;
+        $no_reg = 'PLT-' . $training_id_padded . '-' . $user_id_padded;
 
         // Simpan ke database
         TrainingUser::create([
@@ -127,6 +133,7 @@ class TrainingController extends Controller
 
         return redirect()->route('public.training.success', ['training' => $training->id]);
     }
+    
     public function destroy(TrainingUser $trainingUser)
     {
         $trainingUser->status = 'BATAL';

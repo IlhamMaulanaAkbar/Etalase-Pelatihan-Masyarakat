@@ -14,6 +14,7 @@ class UsersController extends Controller
         $users = User::where('role', 'user')
             ->whereHas('training_users')
             ->with('training_users.training')
+            ->with('assistance_users.assistance')
             ->get();
 
         return view('internal.users.index', compact('users'));

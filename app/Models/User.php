@@ -47,4 +47,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(TrainingUser::class, 'user_id');
     }
+
+    public function assistance_users()
+    {
+        return $this->hasMany(AssistanceUser::class, 'user_id');
+    }
 }

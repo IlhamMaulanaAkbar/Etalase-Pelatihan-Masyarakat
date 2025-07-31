@@ -24,20 +24,30 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="dropdown-item d-flex align-items-center gap-3"
-                                        onclick="event.preventDefault(); document.getElementById('delete-form-{{ $assistance->id }}').submit();">
-                                        <i class="fs-4 ti ti-trash"></i> Delete
+                                    <a href="javascript:void(0)" class="dropdown-item d-flex align-items-center gap-3"
+                                        data-bs-toggle="modal" data-bs-target="#deleteAssistanceModal{{ $assistance->id }}">
+                                        <i class="fs-4 ti ti-trash"></i> Hapus
                                     </a>
-                                    <form id="delete-form-{{ $assistance->id }}"
-                                        action="{{ route('internal.assistance.destroy', $assistance) }}" method="POST"
-                                        style="display: none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
                                 </li>
                             </ul>
                         </div>
-                        <a href="{{ route('internal.training.index') }}" class="btn btn-primary">Kembali</a>
+                        <div class="d-flex flex-wrap gap-6">
+                            <!-- Example single danger button -->
+                            <div class="btn-group">
+                                <button type="button"
+                                    class="btn btn-success dropdown-toggle text-white d-flex align-items-center"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="ti ti-square-plus fs-4 me-2"></i>Tambah
+                                </button>
+                                <ul class="dropdown-menu animated flipInX">
+                                    <li><a class="dropdown-item"
+                                            href="{{ route('internal.lessons.assistance.index', ['assistance' => $assistance->id]) }}">Materi
+                                            Pendampingan</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <a href="{{ route('internal.assistance.index') }}" class="btn btn-primary">Kembali</a>
                     </div>
 
                     <div class="card">
@@ -96,6 +106,33 @@
                                     <div>{!! $assistance->description !!}</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Konfirmasi Hapus Pendampingan -->
+            <div class="modal fade" id="deleteAssistanceModal{{ $assistance->id }}" tabindex="-1"
+                aria-labelledby="deleteAssistanceModalLabel{{ $assistance->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary">
+                            <h5 class="modal-title w-100 text-center text-white" id="deleteAssistanceModalLabel{{ $assistance->id }}">
+                                Konfirmasi Hapus
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Tutup"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            Apakah Anda yakin ingin menghapus pendampingan ini?
+                            <br><strong>"{{ $assistance->assistance_name }}"</strong>
+                        </div>
+                        <div class="modal-footer justify-content-end">
+                            <form action="{{ route('internal.assistance.destroy', $assistance) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+                            </form>
                         </div>
                     </div>
                 </div>

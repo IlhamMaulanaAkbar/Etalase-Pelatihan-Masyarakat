@@ -16,6 +16,18 @@ use App\Http\Controllers\Internal\Page\TrainingEvaluationController as Evaluatio
 use App\Http\Controllers\Internal\Page\InstructorEvaluationController as EvaluationInstructorController;
 use App\Http\Controllers\Internal\Page\AssistanceController;
 use App\Http\Controllers\Internal\Page\AssistanceParticipantController;
+use App\Http\Controllers\Internal\Report\TrainingReportController;
+use App\Http\Controllers\Internal\Report\AssistanceReportController;
+use App\Http\Controllers\Internal\Report\LearningReportController;
+use App\Http\Controllers\Internal\Report\TrainingParticipantsReportController;
+use App\Http\Controllers\Internal\Report\AssistanceParticipantsReportController;
+use App\Http\Controllers\Internal\Report\UsersReportController;
+use App\Http\Controllers\Internal\Report\TrainingEvaluationReportController;
+use App\Http\Controllers\Internal\Report\InstructorEvaluationReportController;
+use App\Http\Controllers\Internal\Lessons\TrainingLessonsController;
+use App\Http\Controllers\Internal\Lessons\AssistanceLessonsController;
+use App\Http\Controllers\Internal\Certificates\CertificatesController;
+
 
 
 Route::prefix('internal')->group(function () {
@@ -96,6 +108,52 @@ Route::prefix('internal')->group(function () {
             Route::get('/instructor-evaluations/{instructor_evaluation}/edit', [InstructorEvaluationController::class, 'edit'])->name('internal.evaluations.instructor-evaluation.edit');
             Route::put('/instructor-evaluations/{instructor_evaluation}', [InstructorEvaluationController::class, 'update'])->name('internal.evaluations.instructor-evaluation.update');
             Route::delete('/instructor-evaluations/{instructor_evaluation}', [InstructorEvaluationController::class, 'destroy'])->name('internal.evaluations.instructor-evaluation.destroy');
+        });
+
+        Route::prefix('training/{training}/training-lessons')->group(function () {
+            Route::get('/', [TrainingLessonsController::class, 'index'])->name('internal.lessons.training.index');
+            Route::get('/create', [TrainingLessonsController::class, 'create'])->name('internal.lessons.training.create');
+            Route::post('/', [TrainingLessonsController::class, 'store'])->name('internal.lessons.training.store');
+            Route::get('/{lesson}/edit', [TrainingLessonsController::class, 'edit'])->name('internal.lessons.training.edit');
+            Route::put('/{lesson}', [TrainingLessonsController::class, 'update'])->name('internal.lessons.training.update');
+            Route::delete('/{lesson}', [TrainingLessonsController::class, 'destroy'])->name('internal.lessons.training.destroy');
+        });
+
+        Route::prefix('assistance/{assistance}/lessons-assistance')->group(function () {
+            Route::get('/', [AssistanceLessonsController::class, 'index'])->name('internal.lessons.assistance.index');
+            Route::get('/create', [AssistanceLessonsController::class, 'create'])->name('internal.lessons.assistance.create');
+            Route::post('/', [AssistanceLessonsController::class, 'store'])->name('internal.lessons.assistance.store');
+            Route::get('/{lesson}/edit', [AssistanceLessonsController::class, 'edit'])->name('internal.lessons.assistance.edit');
+            Route::put('/{lesson}', [AssistanceLessonsController::class, 'update'])->name('internal.lessons.assistance.update');
+            Route::delete('/{lesson}', [AssistanceLessonsController::class, 'destroy'])->name('internal.lessons.assistance.destroy');
+        });
+
+        Route::prefix('/training/{training}/certificates')->group(function () {
+            Route::get('/', [CertificatesController::class, 'index'])->name('internal.certificates.index');
+            Route::get('/create', [CertificatesController::class, 'create'])->name('internal.certificates.create');
+            Route::post('/', [CertificatesController::class, 'store'])->name('internal.certificates.store');
+            Route::get('/{certificate}/edit', [CertificatesController::class, 'edit'])->name('internal.certificates.edit');
+            Route::put('/{certificate}', [CertificatesController::class, 'update'])->name('internal.certificates.update');
+            Route::delete('/{certificate}', [CertificatesController::class, 'destroy'])->name('internal.certificates.destroy');
+        });
+
+        Route::prefix('report')->group(function () {
+            Route::get('/training-report', [TrainingReportController::class, 'index'])->name('internal.report.training-report.index');
+            Route::get('/training-report/print', [TrainingReportController::class, 'print'])->name('internal.report.training-report.print');
+            Route::get('/assistance-report', [AssistanceReportController::class, 'index'])->name('internal.report.assistance-report.index');
+            Route::get('/assistance-report/print', [AssistanceReportController::class, 'print'])->name('internal.report.assistance-report.print');
+            Route::get('/learning-report', [LearningReportController::class, 'index'])->name('internal.report.learning-report.index');
+            Route::get('/learning-report/print', [LearningReportController::class, 'print'])->name('internal.report.learning-report.print');
+            Route::get('/training-participants-report', [TrainingParticipantsReportController::class, 'index'])->name('internal.report.training-participants-report.index');
+            Route::get('/training-participants-report/print', [TrainingParticipantsReportController::class, 'print'])->name('internal.report.training-participants-report.print');
+            Route::get('/assistance-participants-report', [AssistanceParticipantsReportController::class, 'index'])->name('internal.report.assistance-participants-report.index');
+            Route::get('/assistance-participants-report/print', [AssistanceParticipantsReportController::class, 'print'])->name('internal.report.assistance-participants-report.print');
+            Route::get('/users-report', [UsersReportController::class, 'index'])->name('internal.report.users-report.index');
+            Route::get('/users-report/print', [UsersReportController::class, 'print'])->name('internal.report.users-report.print');
+            Route::get('/training-evaluations-report', [TrainingEvaluationReportController::class, 'index'])->name('internal.report.training-evaluations-report.index');
+            Route::get('/training-evaluations-report/print', [TrainingEvaluationReportController::class, 'print'])->name('internal.report.training-evaluations-report.print');
+            Route::get('/instructor-evaluations-report', [InstructorEvaluationReportController::class, 'index'])->name('internal.report.instructor-evaluations-report.index');
+            Route::get('/instructor-evaluations-report/print', [InstructorEvaluationReportController::class, 'print'])->name('internal.report.instructor-evaluations-report.print');
         });
 
         Route::get('/users', [UsersController::class, 'index'])->name('internal.users.index');

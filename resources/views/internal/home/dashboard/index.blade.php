@@ -20,40 +20,40 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card shadow-sm border-0 border-start border-0 border-secondary rounded-2">
+                    <div class="card shadow-sm border-0 border-start border-0 border-primary rounded-2">
                         <div class="card-body d-flex align-items-center social-user">
-                            <div class="me-4 text-secondary">
+                            <div class="me-4 text-primary">
                                 <i class="ti ti-users"></i>
                             </div>
                             <div>
                                 <div class="h4 fw-normal mb-0 count-up" data-target="{{ $totalParticipants }}">0</div>
-                                <div class="text-secondary">Peserta</div>
+                                <div class="text-primary">Peserta</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card shadow-sm border-0 border-start border-0 border-success rounded-2">
+                    <div class="card shadow-sm border-0 border-start border-0 border-primary rounded-2">
                         <div class="card-body d-flex align-items-center social-user">
-                            <div class="me-4 text-success">
+                            <div class="me-4 text-primary">
                                 <i class="ti ti-video"></i>
                             </div>
                             <div>
                                 <div class="h4 fw-normal mb-0 count-up" data-target="{{ $totalVideos }}">0</div>
-                                <div class="text-success">Video</div>
+                                <div class="text-primary">Video</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card shadow-sm border-0 border-start border-0 border-warning rounded-2">
+                    <div class="card shadow-sm border-0 border-start border-0 border-primary rounded-2">
                         <div class="card-body d-flex align-items-center social-user">
-                            <div class="me-4 text-warning">
+                            <div class="me-4 text-primary">
                                 <i class="ti ti-chalkboard"></i>
                             </div>
                             <div class="text-start">
-                                <div class="h4 fw-normal mb-0 count-up" data-target="">0</div>
-                                <div class="text-warning">Pendampingan</div>
+                                <div class="h4 fw-normal mb-0 count-up" data-target="{{ $totalAssistances }}">0</div>
+                                <div class="text-primary">Pendampingan</div>
                             </div>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                 <div class="col-lg-12 mb-2">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title fw-semibold mb-4 fs-3">Statistik Pendaftaran Pelatihan</h5>
+                            <h5 class="card-title fw-semibold mb-4 fs-3">Statistik Pendaftaran Pelatihan & Pendampingan</h5>
                             <div id="training-registration-chart"></div>
                         </div>
                     </div>
@@ -141,23 +141,17 @@
         // Training Registration Chart
         var trainingRegistrationOptions = {
             series: [{
-                name: 'Jumlah Pendaftar',
-                data: {!! json_encode(
-                    array_map(
-                        function ($date, $total) {
-                            return ['x' => $date, 'y' => $total];
-                        },
-                        $trainingRegistrationData['labels']->toArray(),
-                        $trainingRegistrationData['data']->toArray(),
-                    ),
-                ) !!}
-            }],
+                    name: 'Pendaftar Pelatihan',
+                    data: {!! json_encode($trainingRegistrationData['training']) !!}
+                },
+                {
+                    name: 'Pendaftar Pendampingan',
+                    data: {!! json_encode($trainingRegistrationData['assistance']) !!}
+                }
+            ],
             chart: {
                 type: 'area',
                 height: 300,
-                zoom: {
-                    enabled: false
-                },
                 toolbar: {
                     show: false
                 }
@@ -165,13 +159,42 @@
             grid: {
                 show: false
             },
-            colors: ['#559cf9'],
             dataLabels: {
                 enabled: false
             },
             stroke: {
                 curve: 'smooth',
                 width: 3
+            },
+            colors: ['#559cf9', '#34d399'],
+            xaxis: {
+                type: 'category',
+                categories: {!! json_encode($trainingRegistrationData['labels']) !!},
+                labels: {
+                    formatter: function(val) {
+                        return new Date(val).toLocaleDateString('id-ID', {
+                            day: '2-digit',
+                            month: 'long',
+                            year: 'numeric'
+                        });
+                    }
+                }
+            },
+            tooltip: {
+                x: {
+                    formatter: function(val) {
+                        return new Date(val).toLocaleDateString('id-ID', {
+                            day: '2-digit',
+                            month: 'long',
+                            year: 'numeric'
+                        });
+                    }
+                },
+                y: {
+                    formatter: function(val) {
+                        return val + ' pendaftar';
+                    }
+                }
             },
             fill: {
                 type: 'gradient',
@@ -182,21 +205,8 @@
                     stops: [0, 100]
                 }
             },
-            xaxis: {
-                type: 'datetime',
-                labels: {
-                    format: 'dd MMM',
-                }
-            },
-            tooltip: {
-                x: {
-                    format: 'dd MMM yyyy'
-                },
-                y: {
-                    formatter: function(val) {
-                        return val + ' pendaftar'
-                    }
-                }
+            legend: {
+                position: 'top'
             }
         };
 
@@ -205,6 +215,7 @@
             trainingRegistrationOptions
         );
         trainingRegistrationChart.render();
+
 
         // Pre-Test Chart
         // Pre-Test Chart
@@ -306,7 +317,7 @@
                 title: {
                     text: 'Rata-rata Nilai',
 
-                    
+
                 }
             },
             fill: {

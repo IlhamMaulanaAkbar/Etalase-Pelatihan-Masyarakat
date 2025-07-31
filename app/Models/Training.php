@@ -61,4 +61,15 @@ class Training extends Model
     {
         return $this->hasMany(PostTestQuestions::class, 'training_id');
     }
+
+    public function lessonsTraining()
+    {
+        return $this->hasMany(LessonsTraining::class, 'training_id');
+    }
+
+    public function certificates()
+    {
+        return $this->hasMany(Certificates::class, 'training_id');
+    }
+
 }

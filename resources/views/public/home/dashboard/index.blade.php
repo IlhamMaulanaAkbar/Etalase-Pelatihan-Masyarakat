@@ -160,7 +160,7 @@
                                 <div class="card-body d-flex justify-content-between align-items-center social-user">
                                     <div>
                                         <small class="text-muted">Pendampingan</small>
-                                        <h4 class="fw-bolder text-primary mb-0">0</h4>
+                                        <h4 class="fw-bolder text-primary mb-0">{{ $totalAssistances}}</h4>
                                     </div>
                                     <i class="ti ti-chalkboard text-muted fs-2"></i>
                                 </div>
