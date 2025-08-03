@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class UpdateTrainingStatus extends Command
 {
+    // php artisan training:update-status
     protected $signature = 'training:update-status';
     protected $description = 'Update status pelatihan menjadi TUTUP atau SELESAI berdasarkan tanggal';
 

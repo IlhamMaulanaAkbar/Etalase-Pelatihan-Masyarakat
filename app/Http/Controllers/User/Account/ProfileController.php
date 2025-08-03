@@ -61,7 +61,7 @@ class ProfileController extends Controller
                     ->whereIn('ieq_id', $instructorEvaluationQuestions->pluck('id'))
                     ->orderBy('created_at', 'desc')
                     ->value('created_at');
-                    
+
                 $item->has_filled_instructor_evaluation = $instructorEvaluationAnswered;
                 $item->instructor_evaluation_finished_at = $instructorEvaluationAnswered
                     ? $instructorEvaluationAnswered->toIso8601String()
@@ -111,12 +111,37 @@ class ProfileController extends Controller
                 $item->posttest_questions = $postTestQuestions->count();
                 $item->posttest_duration = 15;
 
+                $item->show_certificate = $item->status === 'LULUS' && optional($item->training->end_date)->isPast();
+
                 return $item;
             });
+
+        $assistanceUser = $user->assistance_users()
+            ->with(['assistance', 'assistance.training'])->orderBy('created_at', 'desc')
+            ->get();
+
+        $trainingStats = [
+            'total' => $trainingUser->count(),
+            'lulus' => $trainingUser->where('status', 'LULUS')
+                ->filter(fn($t) => optional($t->training->end_date)->isPast())
+                ->count(),
+            'tidak_lulus' => $trainingUser->where('status', 'BATAL')->count(),
+        ];
+
+        $assistanceStats = [
+            'total' => $assistanceUser->count(),
+            'lulus' => $assistanceUser->where('status', 'LULUS')
+                ->filter(fn($a) => optional($a->assistance->training->end_date)->isPast())
+                ->count(),
+            'tidak_lulus' => $assistanceUser->where('status', 'BATAL')->count(),
+        ];
 
         return view('public.account.profile.index', [
             'user' => $user,
             'trainingUser' => $trainingUser,
+            'assistanceUser' => $assistanceUser,
+            'trainingStats' => $trainingStats,
+            'assistanceStats' => $assistanceStats,
         ]);
     }
 

@@ -173,7 +173,7 @@
             }
             // Countdown 30 menit
             const countdownElement = document.getElementById('countdown');
-            let duration = 1 * 60; // detik
+            let duration = 15 * 60; // detik
 
             const timerInterval = setInterval(() => {
                 const minutes = Math.floor(duration / 60);

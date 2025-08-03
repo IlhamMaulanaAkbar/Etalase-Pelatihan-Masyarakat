@@ -11,7 +11,7 @@
                     <h5 class="card-title fw-semibold mb-4">Edit Materi Pendampingan</h5>
                     <div class="mb-3 text-end">
                         <a href="{{ route('internal.lessons.assistance.index', ['assistance' => $assistance->id]) }}"
-                            class="btn btn-secondary">Kembali</a>
+                            class="btn btn-primary">Kembali</a>
                     </div>
                     <div class="card">
                         <div class="card-body">

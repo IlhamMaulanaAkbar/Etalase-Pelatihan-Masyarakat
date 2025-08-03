@@ -39,10 +39,10 @@ class UsersReportController extends Controller
 
     public function print(Request $request)
     {
-        $query = User::where('role', 'user')
-            ->whereHas('training_users')
-            ->with('training_users.training')
-            ->with('assistance_users.assistance');
+        $query = User::where('role', 'user');
+            // ->whereHas('training_users')
+            // ->with('training_users.training')
+            // ->with('assistance_users.assistance');
 
         if ($request->filled('year')) {
             $query->whereYear('created_at', $request->year);

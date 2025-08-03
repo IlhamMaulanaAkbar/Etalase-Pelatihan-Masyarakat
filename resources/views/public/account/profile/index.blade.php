@@ -43,7 +43,7 @@
                                 <i class="ti ti-pencil-plus me-1"></i>Evaluasi
                             </button>
                         </li>
-                        <li class="nav-item mb-1">
+                        {{-- <li class="nav-item mb-1">
                             <button
                                 class="nav-link text-black-50 fw-semibold d-flex align-items-center justify-content-between tab-link"
                                 data-target="notifikasi" href="#">
@@ -58,7 +58,7 @@
                             <button class="nav-link text-black-50 fw-semibold tab-link" data-target="settings">
                                 <i class="ti ti-settings me-1"></i>Settings
                             </button>
-                        </li>
+                        </li> --}}
                         <li class="nav-item mb-1">
                             <form method="POST" action="{{ route('auth.user.logout.destroy') }}">
                                 @csrf
@@ -95,7 +95,7 @@
                                             class="card-body d-flex justify-content-between align-items-center social-user">
                                             <div>
                                                 <small class="text-muted">Pelatihan</small>
-                                                <p class="text-black mb-0 ">0 Pelatihan</p>
+                                                <p class="text-black mb-0 ">{{ $trainingStats['total'] ?? 0 }} Pelatihan</p>
                                             </div>
                                             <i class="ti ti-chalkboard text-primary fs-2"></i>
                                         </div>
@@ -107,7 +107,7 @@
                                             class="card-body d-flex justify-content-between align-items-center social-user">
                                             <div>
                                                 <small class="text-muted">Lulus</small>
-                                                <p class="text-black mb-0 ">0 Pelatihan</p>
+                                                <p class="text-black mb-0 ">{{ $trainingStats['lulus'] ?? 0 }} Pelatihan</p>
                                             </div>
                                             <i class="ti ti-circle-check text-success fs-2"></i>
                                         </div>
@@ -119,7 +119,48 @@
                                             class="card-body d-flex justify-content-between align-items-center social-user">
                                             <div>
                                                 <small class="text-muted">Tidak Lulus</small>
-                                                <p class="text-black mb-0 ">0 Pelatihan</p>
+                                                <p class="text-black mb-0 ">{{ $trainingStats['tidak_lulus'] ?? 0 }}
+                                                    Pelatihan
+                                                </p>
+                                            </div>
+                                            <i class="ti ti-clipboard-x text-danger fs-2" style="color: red"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mt-0">
+                                    <div class="card shadow-sm border">
+                                        <div
+                                            class="card-body d-flex justify-content-between align-items-center social-user">
+                                            <div>
+                                                <small class="text-muted">Pendampingan</small>
+                                                <p class="text-black mb-0 ">{{ $assistanceStats['total'] ?? 0 }}
+                                                    Pendampingan</p>
+                                            </div>
+                                            <i class="ti ti-chalkboard text-primary fs-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mt-0">
+                                    <div class="card shadow-sm border-0">
+                                        <div
+                                            class="card-body d-flex justify-content-between align-items-center social-user">
+                                            <div>
+                                                <small class="text-muted">Lulus</small>
+                                                <p class="text-black mb-0 ">{{ $assistanceStats['lulus'] ?? 0 }}
+                                                    Pendampingan</p>
+                                            </div>
+                                            <i class="ti ti-circle-check text-success fs-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mt-0">
+                                    <div class="card shadow-sm border-0">
+                                        <div
+                                            class="card-body d-flex justify-content-between align-items-center social-user">
+                                            <div>
+                                                <small class="text-muted">Tidak Lulus</small>
+                                                <p class="text-black mb-0 ">{{ $assistanceStats['tidak_lulus'] ?? 0 }}
+                                                    Pendampingan</p>
                                             </div>
                                             <i class="ti ti-clipboard-x text-danger fs-2" style="color: red"></i>
                                         </div>
@@ -280,14 +321,13 @@
                                             <!-- Jenis Kelamin -->
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-semibold text-black">Jenis Kelamin</label>
-                                                <select name="gender" class="form-select"
-                                                    {{ $user->gender ? 'disabled' : '' }}>
+                                                <select name="gender" class="form-select">
                                                     <option value="">Pilih</option>
                                                     <option value="Laki-laki"
-                                                        {{ old('gender', $user->gender) === 'Laki-laki' ? 'selected' : '' }}>
+                                                        {{ old('gender', $user->gender ?? null) === 'Laki-laki' ? 'selected' : '' }}>
                                                         Laki-laki</option>
                                                     <option value="Perempuan"
-                                                        {{ old('gender', $user->gender) === 'Perempuan' ? 'selected' : '' }}>
+                                                        {{ old('gender', $user->gender ?? null) === 'Perempuan' ? 'selected' : '' }}>
                                                         Perempuan</option>
                                                 </select>
                                                 @if ($user->gender)
@@ -428,6 +468,14 @@
                         </div>
 
                         <div id="pelatihan" class="tab-content d-none">
+                            <h6 class="fw-semibold mb-0 text-black-50">Riwayat Pelatihan</h6>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>Ditemukan {{ $trainingUser->count() }} Pelatihan</div>
+                                <select class="form-select form-select-sm w-auto">
+                                    <option selected>Terbaru</option>
+                                    <option>Terlama</option>
+                                </select>
+                            </div>
                             @if ($trainingUser->isEmpty())
                                 <div class="card text-center shadow-sm p-4">
                                     <p class="mb-3">Belum ada pelatihan yang sedang diikuti</p>
@@ -445,7 +493,9 @@
                                                     <div class="text-muted small mb-0">
                                                         {{ $trainingUsers->training->category->name }}
                                                     </div>
-                                                    @if ($trainingUsers->status === 'LULUS')
+                                                    @if ($trainingUsers->status === 'LULUS' && $trainingUsers->training->end_date->isPast())
+                                                        <span class="badge rounded-pill bg-primary fs-2">Lulus</span>
+                                                    @elseif ($trainingUsers->status === 'LULUS')
                                                         <span class="badge rounded-pill bg-success fs-2">Diterima</span>
                                                     @elseif ($trainingUsers->status === 'DAFTAR')
                                                         <span class="badge rounded-pill bg-warning fs-2">Menunggu</span>
@@ -497,13 +547,19 @@
                                                     @endif
                                                 @endif
 
-                                                @if ($trainingUsers->status == 'LULUS')
+                                                @if ($trainingUsers->status == 'LULUS' && now()->lt($trainingUsers->training->end_date))
                                                     <!-- Tombol Batal hanya jika status LULUS -->
                                                     <button type="button" class="btn btn-danger btn-sm"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#batalModal{{ $trainingUsers->id }}">
                                                         <i class="ti ti-info-circle me-1"></i> Batal Pendaftaran
                                                     </button>
+                                                @endif
+                                                @if ($trainingUsers->status === 'LULUS' && ($trainingUsers->training->end_date)->isPast())
+                                                    <a href="{{ route('public.certificates.index', ['id' => $trainingUsers->id]) }}"
+                                                        class="btn btn-outline-primary btn-sm">
+                                                        <i class="ti ti-certificate me-1"></i>Download Sertifikat
+                                                    </a>
                                                 @endif
                                             @endif
                                         </div>
@@ -570,11 +626,113 @@
                         </div>
 
                         <div id="pendampingan" class="tab-content d-none">
-                            <div class="card text-center shadow-sm p-4">
-                                <p class="mb-3">Belum ada pendampingan yang sedang diikuti</p>
-                                <img src="{{ asset('assets/images/illustrations/chill-sofa.png') }}" alt="Ilustrasi"
-                                    class="img-fluid mx-auto d-block" width="300" height="300">
+                            <h6 class="fw-semibold mb-0 text-black-50">Riwayat Pendampingan</h6>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>Ditemukan {{ $assistanceUser->count() }} Pendampingan</div>
+                                <select class="form-select form-select-sm w-auto">
+                                    <option selected>Terbaru</option>
+                                    <option>Terlama</option>
+                                </select>
                             </div>
+                            @if ($assistanceUser->isEmpty())
+                                <div class="card text-center shadow-sm p-4">
+                                    <p class="mb-3">Belum ada pendampingan yang sedang diikuti</p>
+                                    <img src="{{ asset('assets/images/illustrations/chill-sofa.png') }}" alt="Ilustrasi"
+                                        class="img-fluid mx-auto d-block" width="300" height="300">
+                                </div>
+                            @else
+                                @foreach ($assistanceUser as $assistanceUsers)
+                                    <div class="card shadow-sm mb-4 border-0">
+                                        <div class="d-flex align-items-start gap-3 px-3 pt-3">
+                                            <img src="{{ asset('storage/' . $assistanceUsers->assistance->thumbnail_image) }}"
+                                                alt="Logo" width="80" class="rounded">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div class="text-muted small mb-0">
+                                                        {{ $assistanceUsers->assistance->training->training_name ?? '-' }}
+                                                    </div>
+                                                    @if ($assistanceUsers->status === 'LULUS' && $assistanceUsers->assistance->end_date->isPast())
+                                                        <span class="badge rounded-pill bg-primary fs-2">Lulus</span>
+                                                    @elseif ($assistanceUsers->status === 'LULUS')
+                                                        <span class="badge rounded-pill bg-success fs-2">Diterima</span>
+                                                    @elseif ($assistanceUsers->status === 'DAFTAR')
+                                                        <span class="badge rounded-pill bg-warning fs-2">Menunggu</span>
+                                                    @elseif ($assistanceUsers->status === 'BATAL')
+                                                        <span class="badge rounded-pill bg-danger fs-2">Dibatalkan</span>
+                                                    @endif
+                                                </div>
+                                                <a href="{{ route('public.assistance.show', ['assistance' => $assistanceUsers->assistance->id]) }}"
+                                                    class="mb-1 fw-semibold text-dark">
+                                                    {{ $assistanceUsers->assistance->assistance_name }}
+                                                </a>
+
+                                                <div
+                                                    class="d-flex flex-wrap align-items-center text-muted small mt-1 gap-2">
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <i class="ti ti-calendar-event"></i>
+                                                        <span>
+                                                            {{ $assistanceUsers->assistance->start_date->format('d M Y') }}
+                                                            -
+                                                            {{ $assistanceUsers->assistance->end_date->format('d M Y') }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-1">
+                                                        <i class="ti ti-map-pin"></i>
+                                                        <span>{{ $assistanceUsers->assistance->location }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <hr class="my-3 mx-3">
+
+                                        <div
+                                            class="d-flex justify-content-end flex-wrap align-items-center gap-2 px-3 pb-3">
+                                            @if ($assistanceUsers->status == 'LULUS' && now()->lt($assistanceUsers->assistance->end_date))
+                                                <!-- Tombol khusus jika status masih daftar -->
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#batalMentoringModal{{ $assistanceUsers->id }}">
+                                                    <i class="ti ti-info-circle me-1"></i> Batal Pendampingan
+                                                </button>
+                                            @endif
+                                        </div>
+
+                                        <!-- Modal Konfirmasi Batal Pendampingan -->
+                                        <div class="modal fade" id="batalMentoringModal{{ $assistanceUsers->id }}"
+                                            tabindex="-1"
+                                            aria-labelledby="batalMentoringModalLabel{{ $assistanceUsers->id }}"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0 bg-danger">
+                                                        <h5 class="modal-title text-center w-100 text-white"
+                                                            id="batalMentoringModalLabel{{ $assistanceUsers->id }}">
+                                                            Konfirmasi
+                                                            Pembatalan</h5>
+                                                        <button type="button" class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Apakah Anda yakin ingin membatalkan pendampingan ini?
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <form method="POST"
+                                                            action="{{ route('public.assistance.destroy', $assistanceUsers->id) }}">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="button" class="btn btn-outline-primary"
+                                                                data-bs-dismiss="modal">Batal</button>
+                                                            <button type="submit" class="btn btn-danger">Ya,
+                                                                Batalkan</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
                         <div id="test-asesmen" class="tab-content d-none">
                             <h6 class="fw-semibold mb-0 text-black-50">Riwayat Tes Asesmen</h6>
@@ -607,7 +765,8 @@
                                                 <div class="fw-bold">{{ $trainingUsers->training->training_name }}</div>
 
                                                 <div class="d-flex flex-wrap gap-3 mt-2 text-muted small">
-                                                    <div><i class="ti ti-file-pencil"></i> {{ $trainingUsers->questions }}
+                                                    <div><i class="ti ti-file-pencil"></i>
+                                                        {{ $trainingUsers->questions }}
                                                         Soal</div>
                                                     <div><i class="ti ti-clock"></i> {{ $trainingUsers->duration }} Menit
                                                     </div>
@@ -670,7 +829,8 @@
 
                                     <!-- MODAL PRE-TEST TIDAK TERSEDIA -->
                                     <div class="modal fade" id="noPretestModal{{ $trainingUsers->id }}" tabindex="-1"
-                                        aria-labelledby="noPretestModalLabel{{ $trainingUsers->id }}" aria-hidden="true">
+                                        aria-labelledby="noPretestModalLabel{{ $trainingUsers->id }}"
+                                        aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content border-0 shadow">
                                                 <div class="modal-header bg-danger text-white justify-content-center">
@@ -740,7 +900,7 @@
                                         </button>
                                     </li>
                                 </ul>
-    
+
                                 {{-- Konten Evaluasi --}}
                                 <div class="tab-content">
                                     {{-- ==== TAB EVALUASI PELATIHAN ==== --}}
@@ -748,7 +908,7 @@
                                         @php
                                             $evaluasiPelatihan = $trainingUser->filter(fn($t) => $t->show_evaluation);
                                         @endphp
-    
+
                                         @if ($evaluasiPelatihan->isEmpty())
                                             <div class="card text-center shadow-sm p-4">
                                                 <p class="mb-3">Belum ada evaluasi pelatihan yang tersedia</p>
@@ -772,8 +932,9 @@
                                                     <div class="d-flex justify-content-end align-items-center px-3 pb-3">
                                                         @if ($trainingUsers->has_filled_evaluation)
                                                             <div class="text-success small mt-2">
-                                                                <i class="ti ti-check"></i> Evaluasi sudah diisi pada <span class="user-time"
-                                                            data-time="{{ $trainingUsers->evaluation_finished_at }}"></span>
+                                                                <i class="ti ti-check"></i> Evaluasi sudah diisi pada <span
+                                                                    class="user-time"
+                                                                    data-time="{{ $trainingUsers->evaluation_finished_at }}"></span>
                                                             </div>
                                                         @elseif ($trainingUsers->evaluation_questions > 0)
                                                             <a href="{{ route('public.evaluations.training.start', ['training' => $trainingUsers->training->id]) }}"
@@ -781,7 +942,8 @@
                                                                 <i class="ti ti-book"></i> Mengisi Evaluasi
                                                             </a>
                                                         @else
-                                                            <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                                                            <button type="button"
+                                                                class="btn btn-outline-primary btn-sm mt-2"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#noEvaluasiModal{{ $trainingUsers->id }}">
                                                                 <i class="ti ti-book"></i> Mengisi Evaluasi
@@ -789,7 +951,7 @@
                                                         @endif
                                                     </div>
                                                 </div>
-    
+
                                                 {{-- Modal Evaluasi Pelatihan --}}
                                                 <div class="modal fade" id="noEvaluasiModal{{ $trainingUsers->id }}"
                                                     tabindex="-1" aria-hidden="true">
@@ -818,7 +980,7 @@
                                             @endforeach
                                         @endif
                                     </div>
-    
+
                                     {{-- ==== TAB EVALUASI INSTRUKTUR ==== --}}
                                     <div class="tab-pane fade" id="evaluasi-instruktur" role="tabpanel">
                                         @php
@@ -826,7 +988,7 @@
                                                 fn($t) => $t->show_instructor_evaluation,
                                             );
                                         @endphp
-    
+
                                         @if ($evaluasiInstruktur->isEmpty())
                                             <div class="card text-center shadow-sm p-4">
                                                 <p class="mb-3">Belum ada evaluasi instruktur yang tersedia</p>
@@ -843,14 +1005,15 @@
                                                             <div class="fw-semibold">Evaluasi Instruktur</div>
                                                             <div class="fw-bold">
                                                                 {{ $trainingUsers->training->training_name }}</div>
-                                                                <div class="text-muted small">
-                                                                    {{ $trainingUsers->training->category->name }}</div>
+                                                            <div class="text-muted small">
+                                                                {{ $trainingUsers->training->category->name }}</div>
                                                         </div>
                                                     </div>
                                                     <div class="d-flex justify-content-end align-items-center px-3 pb-3">
                                                         @if ($trainingUsers->has_filled_instructor_evaluation)
                                                             <div class="text-success small mt-2">
-                                                                <i class="ti ti-check"></i> Evaluasi instruktur sudah diisi pada <span class="user-time"
+                                                                <i class="ti ti-check"></i> Evaluasi instruktur sudah diisi
+                                                                pada <span class="user-time"
                                                                     data-time="{{ $trainingUsers->instructor_evaluation_finished_at }}"></span>
                                                             </div>
                                                         @elseif ($trainingUsers->instructor_evaluation_questions > 0)
@@ -859,7 +1022,8 @@
                                                                 <i class="ti ti-book"></i> Isi Evaluasi Instruktur
                                                             </a>
                                                         @else
-                                                            <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                                                            <button type="button"
+                                                                class="btn btn-outline-primary btn-sm mt-2"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#noInstrukturModal{{ $trainingUsers->id }}">
                                                                 <i class="ti ti-book"></i> Isi Evaluasi Instruktur
@@ -867,7 +1031,7 @@
                                                         @endif
                                                     </div>
                                                 </div>
-    
+
                                                 {{-- Modal Evaluasi Instruktur --}}
                                                 <div class="modal fade" id="noInstrukturModal{{ $trainingUsers->id }}"
                                                     tabindex="-1" aria-hidden="true">
@@ -897,7 +1061,7 @@
                                         @endif
                                     </div>
                                 </div>
-                            
+
                             </div>
                             {{-- Navigasi Tab Evaluasi --}}
                         </div>

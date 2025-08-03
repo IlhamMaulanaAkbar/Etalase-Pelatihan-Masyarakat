@@ -74,9 +74,9 @@
             background-color: #f2f2f2;
         }
 
-        .page-break {
+        /* .page-break {
             page-break-before: always;
-        }
+        } */
 
         .signature-section {
             width: 100%;

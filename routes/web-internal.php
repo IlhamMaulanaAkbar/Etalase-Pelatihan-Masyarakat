@@ -72,6 +72,7 @@ Route::prefix('internal')->group(function () {
 
         Route::get('/assistance-participants', [AssistanceParticipantController::class, 'index'])->name('internal.assistance.participants.index');
         Route::get('/assistance-participants/{assistance}', [AssistanceParticipantController::class, 'show'])->name('internal.assistance.participants.show');
+        Route::put('/assistance-participants/{assistance_user}', [AssistanceParticipantController::class, 'status'])->name('internal.assistance.participants.status');
 
         Route::get('/evaluations/training-evaluations', [EvaluationTrainingController::class, 'index'])->name('internal.page.training-evaluation.index');
         Route::get('/evaluations/training-evaluations/{training}', [EvaluationTrainingController::class, 'show'])->name('internal.page.training-evaluation.show');

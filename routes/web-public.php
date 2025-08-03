@@ -15,6 +15,7 @@ use App\Http\Controllers\User\TestAssessment\PreTestController;
 use App\Http\Controllers\User\TestAssessment\PostTestController;
 use App\Http\Controllers\User\Evaluations\TrainingEvaluationController;
 use App\Http\Controllers\User\Page\AssistanceController;
+use App\Http\Controllers\User\Certificates\CertificatesController;
 
 
 Route::get('/', [DashboardController::class, 'index'])->name('public.home.dashboard.index');
@@ -64,6 +65,7 @@ Route::middleware(['auth:user'])->group(function () {
         Route::get('/instructor-evaluation/start', [EvaluationsInstructorController::class, 'start'])->name('public.evaluations.instructor.start');
         Route::get('/instructor-evaluation', [EvaluationsInstructorController::class, 'ongoing'])->name('public.evaluations.instructor.ongoing');
         Route::post('/instructor-evaluation', [EvaluationsInstructorController::class, 'submit'])->name('public.evaluations.instructor.submit');
-
     });
+
+    Route::get('/certificates/{id}', [CertificatesController::class, 'certificate'])->name('public.certificates.index');
 });

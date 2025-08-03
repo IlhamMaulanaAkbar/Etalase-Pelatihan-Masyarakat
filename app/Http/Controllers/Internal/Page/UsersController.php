@@ -12,10 +12,11 @@ class UsersController extends Controller
     {
         // Ambil user yang memiliki relasi ke training_users dan berperan sebagai 'user'
         $users = User::where('role', 'user')
-            ->whereHas('training_users')
-            ->with('training_users.training')
-            ->with('assistance_users.assistance')
             ->get();
+            // ->whereHas('training_users')
+            // ->with('training_users.training')
+            // ->with('assistance_users.assistance')
+            // ->get();
 
         return view('internal.users.index', compact('users'));
     }

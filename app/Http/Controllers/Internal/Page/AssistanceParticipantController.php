@@ -23,9 +23,9 @@ class AssistanceParticipantController extends Controller
         return view('internal.participants.assistance.show', compact('assistance', 'participants'));
     }
 
-    public function status(Request $request, AssistanceUser $assistanceUser)
+    public function status(Request $request, AssistanceUser $assistance_user)
     {
-        if ($assistanceUser->status !== 'DAFTAR') {
+        if ($assistance_user->status !== 'DAFTAR') {
             return back()->with(Alert::error('Status tidak dapat diubah karena sudah diproses.'));
         }
 
@@ -33,13 +33,13 @@ class AssistanceParticipantController extends Controller
             'status' => 'required|in:LULUS,TIDAK_LULUS',
         ]);
 
-        $assistanceUser->status = $request->status;
-        $assistanceUser->is_approved = $request->status === 'LULUS';
+        $assistance_user->status = $request->status;
+        $assistance_user->is_approved = $request->status === 'LULUS';
 
-        if ($request->status === 'LULUS' && !$assistanceUser->verified_at) {
-            $assistanceUser->verified_at = now();
+        if ($request->status === 'LULUS' && !$assistance_user->verified_at) {
+            $assistance_user->verified_at = now();
         }
-        $assistanceUser->save();
+        $assistance_user->save();
 
         return back()->with(Alert::success('Status peserta berhasil diubah.'));
     }

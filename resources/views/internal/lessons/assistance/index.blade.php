@@ -6,6 +6,10 @@
             <div class="container">
                 @include('layouts.partials.alert')
             </div>
+            <div class="mb-3 text-end">
+                <a href="{{ route('internal.assistance.show', ['assistance' => $assistance->id]) }}"
+                    class="btn btn-primary">Kembali</a>
+            </div>
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title fw-semibold mb-4">Materi Pendampingan</h5>

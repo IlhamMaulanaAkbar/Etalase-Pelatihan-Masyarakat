@@ -73,7 +73,7 @@
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="silabus-tab" data-bs-toggle="tab" data-bs-target="#silabus"
-                                type="button" role="tab">Materi Pelatihan</button>
+                                type="button" role="tab">Materi</button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="peserta-tab" data-bs-toggle="tab" data-bs-target="#peserta"
@@ -134,48 +134,47 @@
                                 @endphp --}}
 
                                 {{-- @if ($isAllowed) --}}
-                                    <p class="fw-semibold text-black mb-4">Materi Pelatihan ({{ $totalJp }} JP)</p>
+                                <p class="fw-semibold text-black mb-4">Materi Pelatihan ({{ $totalJp }} JP)</p>
 
-                                    <div class="position-relative ms-4">
-                                        @if ($lessons->count() > 1)
-                                            <!-- Garis vertikal hanya jika ada lebih dari 1 lesson -->
-                                            <div class="position-absolute top-0 start-0 border-start border-2 border-light"
-                                                style="height: 100%; left: 0.5rem;"></div>
-                                        @endif
+                                <div class="position-relative ms-4">
+                                    @if ($lessons->count() > 1)
+                                        <!-- Garis vertikal hanya jika ada lebih dari 1 lesson -->
+                                        <div class="position-absolute top-0 start-0 border-start border-2 border-light"
+                                            style="height: 100%; left: 0.5rem;"></div>
+                                    @endif
 
-                                        @foreach ($lessons as $lesson)
-                                            <!-- Item Materi -->
-                                            <div class="d-flex position-relative mb-3">
-                                                <!-- Titik (dot) -->
-                                                <div class="bg-primary rounded-circle position-absolute"
-                                                    style="width: 12px; height: 12px; left: -0.3rem; top: 0.4rem;">
-                                                </div>
+                                    @foreach ($lessons as $lesson)
+                                        <!-- Item Materi -->
+                                        <div class="d-flex position-relative mb-3">
+                                            <!-- Titik (dot) -->
+                                            <div class="bg-primary rounded-circle position-absolute"
+                                                style="width: 12px; height: 12px; left: -0.3rem; top: 0.4rem;">
+                                            </div>
 
-                                                <!-- Card -->
-                                                <div class="card w-100 ms-4">
-                                                    <div class="card-body">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <div>
-                                                                <h6 class="fw-bold mb-2">{{ $lesson->name }}</h6>
-                                                                <div class="text-muted small">
-                                                                    <i class="bi bi-clock"></i> {{ $lesson->duration }} JP
-                                                                </div>
+                                            <!-- Card -->
+                                            <div class="card w-100 ms-4">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <h6 class="fw-bold mb-2">{{ $lesson->name }}</h6>
+                                                            <div class="text-muted small">
+                                                                <i class="bi bi-clock"></i> {{ $lesson->duration }} JP
                                                             </div>
-                                                            <div>
-                                                                @if ($lesson->file)
-                                                                    <a href="{{ asset('storage/' . $lesson->file) }}"
-                                                                        target="_blank"
-                                                                        class="btn btn-sm btn-outline-primary">
-                                                                        <i class="bi bi-file-earmark-text"></i> Lihat File
-                                                                    </a>
-                                                                @endif
-                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            @if ($lesson->file)
+                                                                <a href="{{ asset('storage/' . $lesson->file) }}"
+                                                                    target="_blank" class="btn btn-sm btn-outline-primary">
+                                                                    <i class="bi bi-file-earmark-text"></i> Lihat File
+                                                                </a>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    </div>
+                                        </div>
+                                    @endforeach
+                                </div>
                                 {{-- @else
                                     <div class="text-center py-5">
                                         <p class="text-muted fs-5">Anda harus <span class="fw-semibold text-dark">mendaftar
@@ -380,12 +379,6 @@
                                             {{ $training->location }}
                                         </div>
                                     </div>
-                                </li>
-
-
-                                <li class="mb-2 d-flex align-items-center border-bottom pb-2">
-                                    <i class="ti ti-calendar-event me-2"></i> Waktu Tes Asesmen <span
-                                        class="ms-auto text-muted">02 Februari 2023</span>
                                 </li>
                                 <li class="mb-2 d-flex align-items-center border-bottom pb-2">
                                     <i class="ti ti-calendar-event me-2"></i> Tgl. Mulai Pelatihan <span

@@ -6,6 +6,10 @@
             <div class="container">
                 @include('layouts.partials.alert')
             </div>
+            <div class="mb-3 text-end">
+                <a href="{{ route('internal.training.show', ['training' => $training->id]) }}"
+                    class="btn btn-primary">Kembali</a>
+            </div>
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title fw-semibold mb-4">Sertifikat Pelatihan</h5>
@@ -63,12 +67,13 @@
                                                 <p class="mb-0 fs-2 fw-normal">{{ $certificate->identity_number }}</p>
                                             </td>
                                             <td class="text-center">
-                                                <p class="mb-0 fs-2 fw-normal">{{ $certificate->issue_date->format('d-m-Y') }}</p>
+                                                <p class="mb-0 fs-2 fw-normal">
+                                                    {{ $certificate->issue_date->format('d-m-Y') }}</p>
                                             </td>
                                             <td class="text-center">
                                                 @if ($certificate->signature_file)
-                                                    <a href="{{ asset('storage/' . $certificate->signature_file) }}" target="_blank"
-                                                        class="btn btn-sm btn-outline-primary">
+                                                    <a href="{{ asset('storage/' . $certificate->signature_file) }}"
+                                                        target="_blank" class="btn btn-sm btn-outline-primary">
                                                         Lihat File
                                                     </a>
                                                 @else
@@ -86,8 +91,8 @@
                                                 </button>
 
                                                 <!-- Modal Konfirmasi -->
-                                                <div class="modal fade" id="deleteModal{{ $certificate->id }}" tabindex="-1"
-                                                    aria-labelledby="deleteModalLabel{{ $certificate->id }}"
+                                                <div class="modal fade" id="deleteModal{{ $certificate->id }}"
+                                                    tabindex="-1" aria-labelledby="deleteModalLabel{{ $certificate->id }}"
                                                     aria-hidden="true">
                                                     <div class="modal-dialog modal-dialog-centered">
                                                         <div class="modal-content">
