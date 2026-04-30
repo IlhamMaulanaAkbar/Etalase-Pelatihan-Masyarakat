@@ -17,12 +17,12 @@ class AssistanceLessonsController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('internal.lessons.assistance.index', compact('lessons', 'assistance'));
+        return view('internal.schedules.assistance.index', compact('lessons', 'assistance'));
     }
 
     public function create(Assistance $assistance)
     {
-        return view('internal.lessons.assistance.create', compact('assistance'));
+        return view('internal.schedules.assistance.create', compact('assistance'));
     }
 
     public function store(Request $request)
@@ -42,13 +42,13 @@ class AssistanceLessonsController extends Controller
             'duration' => $request->duration,
         ]);
 
-        return redirect()->route('internal.lessons.assistance.index', ['assistance' => $request->assistance_id])
+        return redirect()->route('internal.schedules.assistance.index', ['assistance' => $request->assistance_id])
             ->with(Alert::success('Materi Pendampingan berhasil disimpan.'));
     }
 
     public function edit(Assistance $assistance, LessonsAssistance $lesson)
     {
-        return view('internal.lessons.assistance.edit', compact('lesson', 'assistance'));
+        return view('internal.schedules.assistance.edit', compact('lesson', 'assistance'));
     }
 
     public function update(Request $request, Assistance $assistance, LessonsAssistance $lesson)
@@ -73,7 +73,7 @@ class AssistanceLessonsController extends Controller
 
         $lesson->save();
 
-        return redirect()->route('internal.lessons.assistance.index', ['assistance' => $assistance->id])
+        return redirect()->route('internal.schedules.assistance.index', ['assistance' => $assistance->id])
             ->with(Alert::success('Materi Pendampingan berhasil diperbarui.'));
     }
 
@@ -85,7 +85,7 @@ class AssistanceLessonsController extends Controller
         }
         $lesson->delete();
 
-        return redirect()->route('internal.lessons.assistance.index', ['assistance' => $assistance->id])
+        return redirect()->route('internal.schedules.assistance.index', ['assistance' => $assistance->id])
             ->with(Alert::success('Materi Pendampingan berhasil dihapus.'));
     }
 }

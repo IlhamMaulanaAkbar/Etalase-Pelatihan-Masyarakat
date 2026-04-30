@@ -7,10 +7,16 @@ use App\Models\Training;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use Illuminate\Support\Str;
+use App\Models\TrainingAttendance;
+use App\Models\TrainingSchedule;
 use App\Models\TrainingUser;
 use App\Services\Supports\Alert;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TrainingRegistrationMail;
 
 
 class TrainingController extends Controller
@@ -63,13 +69,35 @@ class TrainingController extends Controller
     {
         $user = Auth::guard('user')->user();
 
-        $training->load('category'); // tidak perlu eager-load semua
+        $training->load(['category', 'training_users']); // tidak perlu eager-load semua
 
-        $lessons = $training->lessonsTraining()
-            ->orderBy('created_at', 'desc')
+        $schedules = $training->trainingSchedules()
+            ->orderBy('meeting_number')
+            ->orderBy('date')
             ->get();
 
-        $totalJp = $lessons->sum('duration');
+        $schedules->each(function ($schedule) use ($training) {
+            $this->markMissingAttendancesAsAbsent($training, $schedule);
+        });
+
+        $totalJp = $schedules->sum('duration');
+        $isAcceptedParticipant = false;
+        $attendancesBySchedule = collect();
+        $attendanceWindows = $schedules->mapWithKeys(function ($schedule) {
+            return [$schedule->id => $this->attendanceWindow($schedule)];
+        });
+
+        if ($user) {
+            $isAcceptedParticipant = TrainingUser::where('training_id', $training->id)
+                ->where('user_id', $user->id)
+                ->where('status', 'LULUS')
+                ->exists();
+
+            $attendancesBySchedule = TrainingAttendance::where('training_id', $training->id)
+                ->where('participant_name', $user->name)
+                ->get()
+                ->keyBy('training_schedule_id');
+        }
 
         $acceptedParticipants = TrainingUser::with('user')
             ->where('training_id', $training->id)
@@ -90,7 +118,115 @@ class TrainingController extends Controller
             session()->put($sessionKey, true);
         }
 
-        return view('public.training.show', compact('training', 'user', 'acceptedParticipants', 'lessons', 'totalJp'));
+        return view('public.training.show', compact(
+            'training',
+            'user',
+            'acceptedParticipants',
+            'schedules',
+            'totalJp',
+            'isAcceptedParticipant',
+            'attendancesBySchedule',
+            'attendanceWindows'
+        ));
+    }
+
+    public function storeAttendance(Request $request, Training $training, TrainingSchedule $schedule)
+    {
+        abort_if($schedule->training_id !== $training->id, 404);
+
+        $request->validate([
+            'status' => ['required', Rule::in(['Hadir', 'Izin', 'Sakit', 'Tidak Hadir'])],
+            'note' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $user = Auth::guard('user')->user();
+
+        $isAcceptedParticipant = TrainingUser::where('training_id', $training->id)
+            ->where('user_id', $user->id)
+            ->where('status', 'LULUS')
+            ->exists();
+
+        if (!$isAcceptedParticipant) {
+            Alert::error('Anda belum dinyatakan lulus sebagai peserta pelatihan ini.');
+            return back();
+        }
+
+        $attendanceWindow = $this->attendanceWindow($schedule);
+
+        if (!$attendanceWindow['is_open']) {
+            $this->markMissingAttendancesAsAbsent($training, $schedule);
+
+            Alert::warning('Absensi hanya dibuka sesuai waktu pertemuan.');
+            return back()->withFragment('silabus');
+        }
+
+        $attendanceExists = TrainingAttendance::where('training_id', $training->id)
+            ->where('training_schedule_id', $schedule->id)
+            ->where('participant_name', $user->name)
+            ->exists();
+
+        if ($attendanceExists) {
+            Alert::warning('Anda sudah melakukan absensi untuk pertemuan ini.');
+            return back()->withFragment('silabus');
+        }
+
+        TrainingAttendance::create([
+            'training_id' => $training->id,
+            'training_schedule_id' => $schedule->id,
+            'participant_name' => $user->name,
+            'status' => $request->status,
+            'attendance_time' => now()->format('H:i:s'),
+            'note' => $request->note,
+        ]);
+
+        Alert::success('Absensi berhasil disimpan.');
+        return back()->withFragment('silabus');
+    }
+
+    private function attendanceWindow(TrainingSchedule $schedule): array
+    {
+        $startsAt = Carbon::parse($schedule->date->format('Y-m-d') . ' ' . $schedule->start_time);
+        $endsAt = Carbon::parse($schedule->date->format('Y-m-d') . ' ' . $schedule->end_time);
+        $now = now();
+
+        return [
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+            'is_open' => $now->betweenIncluded($startsAt, $endsAt),
+            'has_started' => $now->gte($startsAt),
+            'has_ended' => $now->gt($endsAt),
+        ];
+    }
+
+    private function markMissingAttendancesAsAbsent(Training $training, TrainingSchedule $schedule): void
+    {
+        if (!$this->attendanceWindow($schedule)['has_ended']) {
+            return;
+        }
+
+        $participants = TrainingUser::with('user')
+            ->where('training_id', $training->id)
+            ->where('status', 'LULUS')
+            ->get();
+
+        foreach ($participants as $participant) {
+            if (!$participant->user) {
+                continue;
+            }
+
+            TrainingAttendance::firstOrCreate(
+                [
+                    'training_id' => $training->id,
+                    'training_schedule_id' => $schedule->id,
+                    'participant_name' => $participant->user->name,
+                ],
+                [
+                    'status' => 'Tidak Hadir',
+                    'attendance_time' => null,
+                    'note' => 'Otomatis tidak hadir karena tidak melakukan absensi sampai jam pelajaran berakhir.',
+                ]
+            );
+        }
     }
 
     public function register(Request $request, Training $training)
@@ -129,11 +265,21 @@ class TrainingController extends Controller
             'letter_recommendation' => $recommendationPath,
         ]);
 
+        Mail::to($user->email)->send(new TrainingRegistrationMail($user, $training, $no_reg));
+
         session(['success_access_training_id' => $training->id]);
+
+        Carbon::setLocale('id');
+        session()->push('admin_notifications', [
+            'type' => 'training_registration',
+            'user_name' => $user->name,
+            'training_name' => $training->training_name,
+            'time' => Carbon::now()->translatedFormat('d F Y H:i'),
+        ]);
 
         return redirect()->route('public.training.success', ['training' => $training->id]);
     }
-    
+
     public function destroy(TrainingUser $trainingUser)
     {
         $trainingUser->status = 'BATAL';

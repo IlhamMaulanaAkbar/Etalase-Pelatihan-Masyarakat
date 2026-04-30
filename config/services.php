@@ -38,5 +38,10 @@ return [
         'internal_login_redirect' => env('GOOGLE_REDIRECT_URI_LOGIN_INTERNAL'),
         'user_login_redirect' => env('GOOGLE_REDIRECT_URI_LOGIN_USER'),
     ],
+    'nocaptcha' => [
+        'sitekey' => env('NOCAPTCHA_SITEKEY'),
+        'secret' => env('NOCAPTCHA_SECRET'),
+    ],
+
 
 ];

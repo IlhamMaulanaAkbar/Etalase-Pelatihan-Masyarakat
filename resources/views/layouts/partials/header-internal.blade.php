@@ -6,33 +6,61 @@
                 <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
                     <i class="ti ti-menu-2"></i>
                 </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown"
+                @php
+                    $notifications = session('admin_notifications', []);
+                    $newCount = count($notifications);
+                @endphp
+
+            <li class="nav-item dropdown">
+                <a class="nav-link nav-icon-hover" href="#" id="drop1" data-bs-toggle="dropdown"
                     aria-expanded="false">
                     <i class="ti ti-bell-ringing"></i>
-                    <div class="notification bg-primary rounded-circle"></div>
+                    @if ($newCount > 0)
+                        <div class="notification bg-primary rounded-circle"></div>
+                    @endif
                 </a>
-                <div class="dropdown-menu dropdown-menu-animate-up" aria-labelledby="drop1">
+                <div class="dropdown-menu dropdown-menu-animate-up p-0" aria-labelledby="drop1"
+                    style="width:300px; max-width:90vw;"> {{-- setengah dari lebar sebelumnya --}}
+
                     <div class="border-bottom px-3 py-2 d-flex justify-content-between align-items-center">
                         <h6 class="mb-0">Notifications</h6>
-                        <span class="badge bg-primary rounded-pill fs-2">5 new</span>
+                        <span class="badge bg-primary rounded-pill fs-2">{{ $newCount }} new</span>
                     </div>
+
                     <div class="message-body">
-                        <a href="#" class="dropdown-item d-flex align-items-end gap-3 py-2 px-3">
-                            <img src="https://i.pravatar.cc/40?img=1" alt="User" class="rounded-circle"
-                                width="40" height="40">
-                            <div>
-                                <h6 class="mb-0 fw-semibold">Pendaftaran Pelatihan Baru</h6>
-                                <small class="text-muted">Andi mendaftar pelatihan “Public Speaking”</small>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="border-top text-center py-2 px-3">
-                        <a href="#" class="btn btn-sm btn-outline-primary w-100 py-2">See All Notifications</a>
+                        @forelse($notifications as $notif)
+                            <a href="#" class="dropdown-item d-flex align-items-start gap-3 py-2 px-3">
+                                <img src="https://i.pravatar.cc/40?u={{ $notif['user_name'] }}" alt="User"
+                                    class="rounded-circle flex-shrink-0" width="40" height="40">
+
+                                <div class="flex-grow-1 overflow-hidden">
+                                    <h6 class="mb-0 fw-semibold">
+                                        @if ($notif['type'] === 'training_registration')
+                                            Pendaftaran Pelatihan Baru
+                                        @elseif($notif['type'] === 'assistance_registration')
+                                            Pendaftaran Pendampingan Baru
+                                        @endif
+                                    </h6>
+                                    <small class="text-muted text-wrap d-block">
+                                        {{ $notif['user_name'] }} mendaftar
+                                        @if ($notif['type'] === 'training_registration')
+                                            pelatihan “{{ $notif['training_name'] }}”
+                                        @elseif($notif['type'] === 'assistance_registration')
+                                            pendampingan “{{ $notif['assistance_name'] }}”
+                                        @endif
+                                    </small>
+                                    <small class="text-muted d-block">
+                                        {{ $notif['time'] }}
+                                    </small>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="text-center py-3">Tidak ada notifikasi</div>
+                        @endforelse
                     </div>
                 </div>
             </li>
+
         </ul>
         <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
             <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">

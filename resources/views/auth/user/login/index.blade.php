@@ -47,6 +47,17 @@
                                         <input type="password" name="password" class="form-control" id="password"
                                             autocomplete="off">
                                     </div>
+                                    <div class="mb-3 text-center">
+                                        {!! NoCaptcha::renderJs() !!}
+
+                                        <div class="d-flex justify-content-center">
+                                            {!! NoCaptcha::display() !!}
+                                        </div>
+
+                                        @error('g-recaptcha-response')
+                                            <div class="text-danger mt-2">{{ $message }}</div>
+                                        @enderror
+                                    </div>
 
                                     <div class="d-flex align-items-center justify-content-end mb-4">
                                         <a class="text-primary fw-bold" href="./index.html">Lupa Password ?</a>

@@ -47,11 +47,17 @@
                             </a>
                         </li>
                     @else
+                        @php
+                            $authUser = Auth::guard('user')->user();
+                            $headerProfilePhotoUrl = $authUser?->photo
+                                ? asset('storage/' . $authUser->photo)
+                                : asset('assets/images/profile/user-1.jpg');
+                        @endphp
                         <li class="nav-item dropdown ">
                             <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="{{ asset('assets/images/profile/user-1.jpg') }}" alt="Profil" width="35"
-                                    height="35" class="rounded-circle">
+                                <img src="{{ $headerProfilePhotoUrl }}" alt="Profil" width="35" height="35"
+                                    class="rounded-circle" style="object-fit: cover;">
                             </a>
                             <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                                 <div class="message-body">

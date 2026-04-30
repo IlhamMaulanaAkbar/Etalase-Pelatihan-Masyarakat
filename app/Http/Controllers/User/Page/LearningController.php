@@ -13,9 +13,43 @@ class LearningController extends Controller
     public function index(Learning $learning, Request $request)
     {
         $youtube = new Youtube();
+        $perPage = 9;
+        $isLoggedIn = auth('user')->check();
 
-        // Default: hanya tampilkan umum & pengumuman
-        $learnings = Learning::whereIn('type', ['umum', 'pengumuman'])->latest()->paginate(9);
+        $tabs = [
+            'all' => 'All',
+            'umum' => 'Kegiatan',
+            'pengumuman' => 'Pengumuman',
+        ];
+
+        if ($isLoggedIn) {
+            $tabs['pelatihan'] = 'Pelatihan';
+            $tabs['pendampingan'] = 'Pendampingan';
+        }
+
+        $activeType = $request->query('type', 'all');
+
+        if (!array_key_exists($activeType, $tabs)) {
+            $activeType = 'all';
+        }
+
+        $query = Learning::latest();
+
+        if ($activeType === 'all') {
+            if (!$isLoggedIn) {
+                $query->whereIn('type', ['umum', 'pengumuman']);
+            }
+        } else {
+            $query->where('type', $activeType);
+        }
+
+        $learnings = $query->paginate($perPage)->withQueryString();
+        $learnings->getCollection()->transform(function ($item) use ($youtube) {
+            $item->thumbnail = $youtube->getThumbnail($item->video_url);
+            $item->video_url = $youtube->getEmbedUrl($item->video_url);
+
+            return $item;
+        });
 
         $sessionKey = 'viewed_learnings_' . $learning->id;
 
@@ -23,34 +57,11 @@ class LearningController extends Controller
             $learning->increment('views');
             session()->put($sessionKey, true);
         }
-        // Kategori per-type
-        $umum = Learning::where('type', 'umum')->latest()->get();
-        $pengumuman = Learning::where('type', 'pengumuman')->latest()->get();
-
-        $pelatihan = collect();
-        $pendampingan = collect();
-
-        if (auth('user')->check()) {
-            // Tambahkan jika login
-            $learnings = Learning::latest()->paginate(9);
-            $pelatihan = Learning::where('type', 'pelatihan')->latest()->get();
-            $pendampingan = Learning::where('type', 'pendampingan')->latest()->get();
-        }
-
-        // Generate thumbnail dan embed URL untuk semua
-        foreach ([$learnings, $umum, $pengumuman, $pelatihan, $pendampingan] as $collection) {
-            foreach ($collection as $item) {
-                $item->thumbnail = $youtube->getThumbnail($item->video_url);
-                $item->video_url = $youtube->getEmbedUrl($item->video_url);
-            }
-        }
 
         return view('public.learning.index', [
             'learnings' => $learnings,
-            'umum' => $umum,
-            'pengumuman' => $pengumuman,
-            'pelatihan' => $pelatihan,
-            'pendampingan' => $pendampingan
+            'tabs' => $tabs,
+            'activeType' => $activeType,
         ]);
     }
 }

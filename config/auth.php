@@ -44,10 +44,12 @@ return [
         'internal' => [
             'driver' => 'session',
             'provider' => 'users',
+            'session' => 'internal_session', 
         ],
         'user' => [
             'driver' => 'session',
             'provider' => 'users',
+            'session' => 'user_session',
         ],
     ],
 

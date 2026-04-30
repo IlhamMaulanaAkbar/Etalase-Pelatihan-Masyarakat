@@ -16,6 +16,9 @@ use App\Models\TrainingEvaluationQuestions;
 use App\Models\TrainingEvaluationUsersAnswers;
 use App\Models\InstructorEvaluationQuestions;
 use App\Models\InstructorEvaluationUsersAnswers;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
@@ -156,6 +159,7 @@ class ProfileController extends Controller
             'phone' => $user->phone ?? $request->phone,
             'gender' => $user->gender ?? $request->gender,
             'date_of_birth' => $user->date_of_birth ?? $request->date_of_birth,
+            'place_of_birth' => $user->place_of_birth ?? $request->place_of_birth,
         ]);
 
         // Validasi
@@ -175,11 +179,51 @@ class ProfileController extends Controller
             'education_institutions' => 'nullable|string|max:255',
             'religion' => 'nullable|string|max:128',
             'photo' => 'nullable|image|max:2048',
+            'cropped_avatar' => 'nullable|string',
         ]);
+
+        unset($validated['photo'], $validated['cropped_avatar']);
+
+        if ($request->filled('cropped_avatar')) {
+            $validated['photo'] = $this->storeCroppedAvatar($request->cropped_avatar, $user);
+        }
 
         // Update user
         $user->update($validated);
 
         return redirect()->back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    private function storeCroppedAvatar(string $croppedAvatar, User $user): string
+    {
+        if (!preg_match('/^data:image\/(jpeg|jpg|png|webp);base64,/', $croppedAvatar, $matches)) {
+            throw ValidationException::withMessages([
+                'cropped_avatar' => 'Format foto profil tidak valid.',
+            ]);
+        }
+
+        $imageData = substr($croppedAvatar, strpos($croppedAvatar, ',') + 1);
+        $imageData = base64_decode($imageData, true);
+
+        if ($imageData === false) {
+            throw ValidationException::withMessages([
+                'cropped_avatar' => 'Foto profil gagal diproses.',
+            ]);
+        }
+
+        if (strlen($imageData) > 2 * 1024 * 1024) {
+            throw ValidationException::withMessages([
+                'cropped_avatar' => 'Ukuran foto profil maksimal 2MB.',
+            ]);
+        }
+
+        if ($user->photo && Storage::disk('public')->exists($user->photo)) {
+            Storage::disk('public')->delete($user->photo);
+        }
+
+        $path = 'profile-photos/' . $user->id . '-' . Str::uuid() . '.jpg';
+        Storage::disk('public')->put($path, $imageData);
+
+        return $path;
     }
 }

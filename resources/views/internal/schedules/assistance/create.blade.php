@@ -8,24 +8,24 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title fw-semibold mb-4">Tambah Materi Pelatihan</h5>
+                    <h5 class="card-title fw-semibold mb-4">Tambah Materi Pendampingan</h5>
                     <div class="mb-3 text-end">
-                        <a href="{{ route('internal.lessons.training.index', ['training' => $training->id]) }}"
+                        <a href="{{ route('internal.schedules.assistance.index', ['assistance' => $assistance->id]) }}"
                             class="btn btn-primary">Kembali</a>
                     </div>
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route('internal.lessons.training.store', ['training' => $training->id]) }}"
+                            <form action="{{ route('internal.schedules.assistance.store', ['assistance' => $assistance->id]) }}"
                                 method="POST" enctype="multipart/form-data">
                                 @csrf
-                                <input type="hidden" name="training_id" value="{{ $training->id }}">
+                                <input type="hidden" name="assistance_id" value="{{ $assistance->id }}">
                                 <div class="mb-3">
-                                    <label for="name" class="form-label">Nama Materi Pelatihan</label>
+                                    <label for="name" class="form-label">Nama Materi Pendampingan</label>
                                     <input type="text" class="form-control" id="name" name="name" required
                                         value="{{ old('name') }}">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="file" class="form-label">File Materi Pelatihan</label>
+                                    <label for="file" class="form-label">File Materi Pendampingan</label>
                                     <input type="file" class="form-control" id="file" name="file" required
                                         value="{{ old('file') }}" accept='.pdf,.docx,.pptx, .xlsx'>
                                 </div>

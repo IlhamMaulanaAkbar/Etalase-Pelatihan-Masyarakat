@@ -31,7 +31,7 @@
                                         <th class="fs-2 fw-semibold mb-0">Institusi Pendidikan</th>
                                         <th class="fs-2 fw-semibold mb-0">Pelatihan yang Diikuti</th>
                                         <th class="fs-2 fw-semibold mb-0">Pendampingan yang Diikuti</th>
-                                        <th class="fs-2 fw-semibold mb-0">Aksi</th>
+                                        {{-- <th class="fs-2 fw-semibold mb-0">Aksi</th> --}}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -92,9 +92,9 @@
                                                     {{ $item->assistance_users->count() }} Pendampingan
                                                 </p>
                                             </td>
-                                            <td class="text-center">
+                                            {{-- <td class="text-center">
                                                 <a href="#" class="btn btn-outline-danger btn-sm"><i class="ti ti-trash"></i></a>
-                                            </td>
+                                            </td> --}}
                                         </tr>
                                     @endforeach
                                 </tbody>

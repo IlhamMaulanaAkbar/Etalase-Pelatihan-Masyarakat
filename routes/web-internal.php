@@ -24,7 +24,7 @@ use App\Http\Controllers\Internal\Report\AssistanceParticipantsReportController;
 use App\Http\Controllers\Internal\Report\UsersReportController;
 use App\Http\Controllers\Internal\Report\TrainingEvaluationReportController;
 use App\Http\Controllers\Internal\Report\InstructorEvaluationReportController;
-use App\Http\Controllers\Internal\Lessons\TrainingLessonsController;
+use App\Http\Controllers\Internal\Schedules\TrainingSchedulesController;
 use App\Http\Controllers\Internal\Lessons\AssistanceLessonsController;
 use App\Http\Controllers\Internal\Certificates\CertificatesController;
 
@@ -111,22 +111,23 @@ Route::prefix('internal')->group(function () {
             Route::delete('/instructor-evaluations/{instructor_evaluation}', [InstructorEvaluationController::class, 'destroy'])->name('internal.evaluations.instructor-evaluation.destroy');
         });
 
-        Route::prefix('training/{training}/training-lessons')->group(function () {
-            Route::get('/', [TrainingLessonsController::class, 'index'])->name('internal.lessons.training.index');
-            Route::get('/create', [TrainingLessonsController::class, 'create'])->name('internal.lessons.training.create');
-            Route::post('/', [TrainingLessonsController::class, 'store'])->name('internal.lessons.training.store');
-            Route::get('/{lesson}/edit', [TrainingLessonsController::class, 'edit'])->name('internal.lessons.training.edit');
-            Route::put('/{lesson}', [TrainingLessonsController::class, 'update'])->name('internal.lessons.training.update');
-            Route::delete('/{lesson}', [TrainingLessonsController::class, 'destroy'])->name('internal.lessons.training.destroy');
+        Route::prefix('training/{training}/training-schedules')->group(function () {
+            Route::get('/', [TrainingSchedulesController::class, 'index'])->name('internal.schedules.training.index');
+            Route::get('/create', [TrainingSchedulesController::class, 'create'])->name('internal.schedules.training.create');
+            Route::post('/', [TrainingSchedulesController::class, 'store'])->name('internal.schedules.training.store');
+            Route::get('/{schedule}', [TrainingSchedulesController::class, 'show'])->name('internal.schedules.training.show');
+            Route::get('/{schedule}/edit', [TrainingSchedulesController::class, 'edit'])->name('internal.schedules.training.edit');
+            Route::put('/{schedule}', [TrainingSchedulesController::class, 'update'])->name('internal.schedules.training.update');
+            Route::delete('/{schedule}', [TrainingSchedulesController::class, 'destroy'])->name('internal.schedules.training.destroy');
         });
 
         Route::prefix('assistance/{assistance}/lessons-assistance')->group(function () {
-            Route::get('/', [AssistanceLessonsController::class, 'index'])->name('internal.lessons.assistance.index');
-            Route::get('/create', [AssistanceLessonsController::class, 'create'])->name('internal.lessons.assistance.create');
-            Route::post('/', [AssistanceLessonsController::class, 'store'])->name('internal.lessons.assistance.store');
-            Route::get('/{lesson}/edit', [AssistanceLessonsController::class, 'edit'])->name('internal.lessons.assistance.edit');
-            Route::put('/{lesson}', [AssistanceLessonsController::class, 'update'])->name('internal.lessons.assistance.update');
-            Route::delete('/{lesson}', [AssistanceLessonsController::class, 'destroy'])->name('internal.lessons.assistance.destroy');
+            Route::get('/', [AssistanceLessonsController::class, 'index'])->name('internal.schedules.assistance.index');
+            Route::get('/create', [AssistanceLessonsController::class, 'create'])->name('internal.schedules.assistance.create');
+            Route::post('/', [AssistanceLessonsController::class, 'store'])->name('internal.schedules.assistance.store');
+            Route::get('/{lesson}/edit', [AssistanceLessonsController::class, 'edit'])->name('internal.schedules.assistance.edit');
+            Route::put('/{lesson}', [AssistanceLessonsController::class, 'update'])->name('internal.schedules.assistance.update');
+            Route::delete('/{lesson}', [AssistanceLessonsController::class, 'destroy'])->name('internal.schedules.assistance.destroy');
         });
 
         Route::prefix('/training/{training}/certificates')->group(function () {

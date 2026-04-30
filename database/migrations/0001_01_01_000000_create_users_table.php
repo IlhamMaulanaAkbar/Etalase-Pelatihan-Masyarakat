@@ -24,7 +24,7 @@ return new class extends Migration
             $table->text('place_of_birth')->nullable();
             $table->string('phone', 255)->nullable();
             $table->timestamp('phone_verified_at')->nullable();
-            $table->enum('gender', ['Laki-laki', 'Perempuan']);
+            $table->enum('gender', ['Laki-laki', 'Perempuan'])->nullable();
             $table->string('province', 128)->nullable();
             $table->string('city', 128)->nullable();
             $table->string('district', 128)->nullable();

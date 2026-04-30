@@ -1,5 +1,33 @@
 @extends('layouts.base-public')
 
+@php
+    $profilePhotoUrl = $user->photo ? asset('storage/' . $user->photo) : asset('assets/images/profile/user-1.jpg');
+@endphp
+
+@push('styles')
+    <style>
+        .profile-crop-container {
+            width: 100%;
+            height: 320px;
+            background-color: #f7f7f7;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .profile-crop-container img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .cropper-view-box,
+        .cropper-face {
+            border-radius: 50%;
+        }
+    </style>
+@endpush
+
 @section('content')
     <section class="bg-light py-lg-5">
         <div class="container">
@@ -74,8 +102,8 @@
                 <!-- Main content -->
                 <main class="col-md-9 ms-sm-auto col-lg-10 p-4">
                     <div class="d-flex align-items-center mb-4">
-                        <img src="{{ asset('assets/images/profile/user-1.jpg') }}" alt="Foto Profil" width="50"
-                            height="50" class="rounded-circle me-3">
+                        <img src="{{ $profilePhotoUrl }}" alt="Foto Profil" width="50" height="50"
+                            class="rounded-circle me-3" style="object-fit: cover;">
                         <div>
                             <p class="mb-0">Selamat Datang,</p>
                             <h4 class="fw-bolder mb-0">{{ $user->name }}</h4>
@@ -167,12 +195,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <h5 class="fw-bold mb-3">Aktivitas</h5>
+                            {{-- <h5 class="fw-bold mb-3">Aktivitas</h5>
                             <div class="card text-center shadow-sm p-4">
                                 <p class="mb-3">Belum ada aktivitas yang sedang berjalan</p>
                                 <img src="{{ asset('assets/images/illustrations/chill-sofa.png') }}" alt="Ilustrasi"
                                     class="img-fluid mx-auto d-block" width="300" height="300">
-                            </div>
+                            </div> --}}
                         </div>
 
                         <div id="data-diri" class="tab-content d-none">
@@ -249,7 +277,7 @@
                                             <div>{{ $user->education ?? '-' }}</div>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <div class="fw-semibold text-black">Instansi Pendidikan</div>
+                                            <div class="fw-semibold text-black">Instansi Pendidikan Terakhir</div>
                                             <div>{{ $user->education_institutions ?? '-' }}</div>
                                         </div>
                                     </div>
@@ -272,12 +300,25 @@
                             <div class="card border rounded overflow-hidden">
                                 <div class="card-body py-5">
                                     <h6 class="fw-bolder mb-4 text-black-50">Data Diri</h6>
-
-                                    <form method="POST" action="{{ route('public.account.profile.update') }}">
+                                    <div class="mb-4 text-center">
+                                        <img src="{{ $profilePhotoUrl }}" id="avatarPreview" alt="Foto Profil"
+                                            class="rounded-circle mb-3"
+                                            style="width:120px; height:120px; object-fit:cover;">
+                                        <br>
+                                        <button type="button" class="btn btn-primary rounded-pill fs-2"
+                                            data-bs-toggle="modal" data-bs-target="#uploadFotoModal">
+                                            Ubah Foto Profil
+                                        </button>
+                                    </div>
+                                    <form method="POST" action="{{ route('public.account.profile.update') }}"
+                                        enctype="multipart/form-data">
                                         @csrf
                                         @method('PUT')
+                                        <input type="hidden" name="cropped_avatar" id="croppedAvatar">
 
                                         <div class="row">
+
+
                                             <!-- Nama -->
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-semibold text-black">Nama Lengkap</label>
@@ -321,16 +362,19 @@
                                             <!-- Jenis Kelamin -->
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-semibold text-black">Jenis Kelamin</label>
-                                                <select name="gender" class="form-select">
+                                                <select name="gender" class="form-select"
+                                                    {{ $user->gender ? 'disabled' : '' }}>
                                                     <option value="">Pilih</option>
                                                     <option value="Laki-laki"
-                                                        {{ old('gender', $user->gender ?? null) === 'Laki-laki' ? 'selected' : '' }}>
+                                                        {{ old('gender', $user->gender) === 'Laki-laki' ? 'selected' : '' }}>
                                                         Laki-laki</option>
                                                     <option value="Perempuan"
-                                                        {{ old('gender', $user->gender ?? null) === 'Perempuan' ? 'selected' : '' }}>
+                                                        {{ old('gender', $user->gender) === 'Perempuan' ? 'selected' : '' }}>
                                                         Perempuan</option>
                                                 </select>
+
                                                 @if ($user->gender)
+                                                    <!-- input hidden ini hanya berguna jika select-nya disabled -->
                                                     <input type="hidden" name="gender" value="{{ $user->gender }}">
                                                 @endif
                                             </div>
@@ -443,7 +487,7 @@
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label fw-semibold text-black">Institusi
-                                                    Pendidikan</label>
+                                                    Pendidikan Terakhir</label>
                                                 <input type="text" name="education_institutions" class="form-control"
                                                     value="{{ old('education_institutions', $user->education_institutions) }}">
                                             </div>
@@ -451,7 +495,7 @@
 
                                         <div
                                             class="text-center mt-4 d-flex gap-4 justify-content-center flex-column flex-md-row">
-                                            <button
+                                            <button type="button"
                                                 class="btn btn-outline-primary py-3 w-100 rounded-pill fw-semibold tab-link"
                                                 data-target="data-diri">
                                                 Batal
@@ -463,6 +507,47 @@
                                             </button>
                                         </div>
                                     </form>
+                                </div>
+                            </div>
+                            <div class="modal fade" id="uploadFotoModal" tabindex="-1"
+                                aria-labelledby="uploadFotoModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="uploadFotoModalLabel">Upload Foto Profil</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="profile-crop-container mb-3">
+                                                <img id="previewImage" src="" alt="Foto yang akan dipotong">
+                                            </div>
+
+                                            <div class="d-flex justify-content-center gap-2 mb-3">
+                                                <button type="button" class="btn btn-outline-secondary" id="zoomIn">
+                                                    <i class="ti ti-zoom-in"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary" id="zoomOut">
+                                                    <i class="ti ti-zoom-out"></i>
+                                                </button>
+                                            </div>
+
+                                            <label for="inputImage" class="form-label fw-semibold">Foto Profil</label>
+                                            <input type="file" id="inputImage"
+                                                accept="image/jpeg,image/png,image/webp" class="form-control">
+                                            <div class="form-text">Format JPG, PNG, atau WEBP. Maksimal 2MB.</div>
+                                            <div id="avatarError" class="text-danger small mt-2 d-none"></div>
+                                            <div class="alert alert-info mt-3 mb-0">
+                                                Setelah foto dipotong, klik Simpan di form profil untuk menyimpan perubahan.
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer justify-content-center">
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                data-bs-dismiss="modal">Batal</button>
+                                            <button type="button" id="cropButton" class="btn btn-primary">Crop &
+                                                Save</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -513,7 +598,8 @@
                                                     <div class="d-flex align-items-center gap-1">
                                                         <i class="ti ti-calendar-event"></i>
                                                         <span>
-                                                            {{ $trainingUsers->training->start_date->format('d M Y') }} -
+                                                            {{ $trainingUsers->training->start_date->format('d M Y') }}
+                                                            -
                                                             {{ $trainingUsers->training->end_date->format('d M Y') }}
                                                         </span>
                                                     </div>
@@ -555,7 +641,7 @@
                                                         <i class="ti ti-info-circle me-1"></i> Batal Pendaftaran
                                                     </button>
                                                 @endif
-                                                @if ($trainingUsers->status === 'LULUS' && ($trainingUsers->training->end_date)->isPast())
+                                                @if ($trainingUsers->status === 'LULUS' && $trainingUsers->training->end_date->isPast())
                                                     <a href="{{ route('public.certificates.index', ['id' => $trainingUsers->id]) }}"
                                                         class="btn btn-outline-primary btn-sm">
                                                         <i class="ti ti-certificate me-1"></i>Download Sertifikat
@@ -762,13 +848,15 @@
                                                 </div>
                                                 <div class="text-muted small">
                                                     {{ $trainingUsers->training->category->name }}</div>
-                                                <div class="fw-bold">{{ $trainingUsers->training->training_name }}</div>
+                                                <div class="fw-bold">{{ $trainingUsers->training->training_name }}
+                                                </div>
 
                                                 <div class="d-flex flex-wrap gap-3 mt-2 text-muted small">
                                                     <div><i class="ti ti-file-pencil"></i>
                                                         {{ $trainingUsers->questions }}
                                                         Soal</div>
-                                                    <div><i class="ti ti-clock"></i> {{ $trainingUsers->duration }} Menit
+                                                    <div><i class="ti ti-clock"></i> {{ $trainingUsers->duration }}
+                                                        Menit
                                                     </div>
                                                 </div>
                                             </div>
@@ -777,10 +865,12 @@
                                         <!-- Tombol aksi atau status -->
                                         <div class="px-3 pb-3">
                                             @if ($trainingUsers->has_pretest_answered)
-                                                <div class="text-success small mt-2">
-                                                    <i class="ti ti-check"></i> Pre Test Sudah Dikerjakan :
-                                                    <span class="user-time"
-                                                        data-time="{{ $trainingUsers->finished_at }}"></span>
+                                                <div>
+                                                    <span class="btn btn-success btn-sm mt-2">
+                                                        <i class="ti ti-check"></i> Pre Test Sudah Dikerjakan :
+                                                        <span class="user-time"
+                                                            data-time="{{ $trainingUsers->finished_at }}"></span> WITA
+                                                    </span>
                                                 </div>
                                             @elseif ($trainingUsers->questions > 0)
                                                 <div class="d-flex justify-content-end align-items-center">
@@ -802,10 +892,12 @@
                                             {{-- === POST-TEST (Jika Syarat Terpenuhi) === --}}
                                             @if ($trainingUsers->show_posttest)
                                                 @if ($trainingUsers->has_posttest_answered)
-                                                    <div class="text-success small mt-2">
-                                                        <i class="ti ti-check"></i> Post Test sudah dikerjakan :
-                                                        <span class="user-time"
-                                                            data-time="{{ $trainingUsers->posttest_finished_at }}"></span>
+                                                    <div>
+                                                        <span class="btn btn-success btn-sm mt-2">
+                                                            <i class="ti ti-check"></i> Post Test sudah dikerjakan :
+                                                            <span class="user-time"
+                                                                data-time="{{ $trainingUsers->posttest_finished_at }}"></span> WITA
+                                                        </span>
                                                     </div>
                                                 @elseif ($trainingUsers->posttest_questions > 0)
                                                     <div class="d-flex justify-content-end align-items-center">
@@ -843,7 +935,8 @@
                                                 </div>
                                                 <div class="modal-body text-center">
                                                     Mohon maaf, pre-test untuk pelatihan
-                                                    <strong>{{ $trainingUsers->training->training_name }}</strong> belum
+                                                    <strong>{{ $trainingUsers->training->training_name }}</strong>
+                                                    belum
                                                     tersedia saat ini.
                                                 </div>
                                                 <div class="modal-footer justify-content-center">
@@ -870,7 +963,8 @@
                                                 </div>
                                                 <div class="modal-body text-center">
                                                     Mohon maaf, post-test untuk pelatihan
-                                                    <strong>{{ $trainingUsers->training->training_name }}</strong> belum
+                                                    <strong>{{ $trainingUsers->training->training_name }}</strong>
+                                                    belum
                                                     tersedia saat ini.
                                                 </div>
                                                 <div class="modal-footer justify-content-center">
@@ -931,11 +1025,11 @@
                                                     </div>
                                                     <div class="d-flex justify-content-end align-items-center px-3 pb-3">
                                                         @if ($trainingUsers->has_filled_evaluation)
-                                                            <div class="text-success small mt-2">
-                                                                <i class="ti ti-check"></i> Evaluasi sudah diisi pada <span
-                                                                    class="user-time"
-                                                                    data-time="{{ $trainingUsers->evaluation_finished_at }}"></span>
-                                                            </div>
+                                                            <span class="btn btn-success btn-sm mt-2 d-inline-block">
+                                                                <i class="ti ti-check"></i> Evaluasi sudah diisi pada
+                                                                <span class="user-time"
+                                                                    data-time="{{ $trainingUsers->evaluation_finished_at }}"></span> WITA
+                                                            </span>
                                                         @elseif ($trainingUsers->evaluation_questions > 0)
                                                             <a href="{{ route('public.evaluations.training.start', ['training' => $trainingUsers->training->id]) }}"
                                                                 class="btn btn-outline-primary btn-sm mt-2">
@@ -1011,11 +1105,12 @@
                                                     </div>
                                                     <div class="d-flex justify-content-end align-items-center px-3 pb-3">
                                                         @if ($trainingUsers->has_filled_instructor_evaluation)
-                                                            <div class="text-success small mt-2">
+                                                            <span class="btn btn-success btn-sm mt-2 d-inline-block">
                                                                 <i class="ti ti-check"></i> Evaluasi instruktur sudah diisi
-                                                                pada <span class="user-time"
-                                                                    data-time="{{ $trainingUsers->instructor_evaluation_finished_at }}"></span>
-                                                            </div>
+                                                                pada
+                                                                <span class="user-time"
+                                                                    data-time="{{ $trainingUsers->instructor_evaluation_finished_at }}"></span> WITA
+                                                            </span>
                                                         @elseif ($trainingUsers->instructor_evaluation_questions > 0)
                                                             <a href="{{ route('public.evaluations.instructor.start', ['training' => $trainingUsers->training->id]) }}"
                                                                 class="btn btn-outline-primary btn-sm mt-2">
@@ -1085,27 +1180,42 @@
         document.addEventListener('DOMContentLoaded', function() {
             const links = document.querySelectorAll('.tab-link');
             const contents = document.querySelectorAll('#tab-contents > div');
+            const sidebarLinks = document.querySelectorAll('nav .tab-link');
+
+            function updateActiveLink(activeLink) {
+                // Mengatur ulang semua tautan bilah sisi ke status defaultnya
+                sidebarLinks.forEach(l => {
+                    l.classList.remove('text-primary');
+                    l.classList.add('text-black-50');
+                });
+
+                // Atur tautan aktif yang baru
+                if (activeLink && activeLink.closest('nav')) {
+                    activeLink.classList.remove('text-black-50');
+                    activeLink.classList.add('text-primary');
+                }
+            }
 
             links.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
 
-                    // Hapus semua active dan warna
-                    // links.forEach(l => l.classList.remove('active', 'text-primary'));
-                    // this.classList.add('active', 'text-black');
+                    updateActiveLink(this);
 
                     const target = this.dataset.target;
-
-                    // Sembunyikan semua konten
                     contents.forEach(content => content.classList.add('d-none'));
-
-                    // Tampilkan konten sesuai target
                     const targetContent = document.getElementById(target);
                     if (targetContent) {
                         targetContent.classList.remove('d-none');
                     }
                 });
             });
+
+            // Atur tautan aktif awal saat halaman dimuat
+            const initialActiveLink = document.querySelector('nav .tab-link[data-target="dashboard"]');
+            if (initialActiveLink) {
+                updateActiveLink(initialActiveLink);
+            }
         });
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.user-time').forEach(function(el) {
@@ -1122,8 +1232,121 @@
             });
         });
 
-        function bukaEvaluasi() {
-            document.getElementById('evaluasi').classList.remove('d-none');
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadModalEl = document.getElementById('uploadFotoModal');
+            const image = document.getElementById('previewImage');
+            const inputImage = document.getElementById('inputImage');
+            const cropButton = document.getElementById('cropButton');
+            const zoomInBtn = document.getElementById('zoomIn');
+            const zoomOutBtn = document.getElementById('zoomOut');
+            const avatarPreview = document.getElementById('avatarPreview');
+            const croppedAvatar = document.getElementById('croppedAvatar');
+            const avatarError = document.getElementById('avatarError');
+
+            if (!uploadModalEl || !image || !inputImage || !cropButton || !window.Cropper) {
+                return;
+            }
+
+            const uploadModal = new bootstrap.Modal(uploadModalEl);
+            let cropper;
+
+            function showAvatarError(message) {
+                avatarError.textContent = message;
+                avatarError.classList.remove('d-none');
+            }
+
+            function clearAvatarError() {
+                avatarError.textContent = '';
+                avatarError.classList.add('d-none');
+            }
+
+            function destroyCropper() {
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
+            }
+
+            inputImage.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                clearAvatarError();
+                destroyCropper();
+
+                if (!file) {
+                    image.removeAttribute('src');
+                    return;
+                }
+
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    showAvatarError('Format foto harus JPG, PNG, atau WEBP.');
+                    inputImage.value = '';
+                    return;
+                }
+
+                const maxSize = 2 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    showAvatarError('Ukuran foto maksimal 2MB.');
+                    inputImage.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    image.src = event.target.result;
+
+                    cropper = new Cropper(image, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        dragMode: 'move',
+                        responsive: true,
+                        autoCropArea: 0.85,
+                        background: false,
+                        guides: false,
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+
+            zoomInBtn?.addEventListener('click', function() {
+                cropper?.zoom(0.1);
+            });
+
+            zoomOutBtn?.addEventListener('click', function() {
+                cropper?.zoom(-0.1);
+            });
+
+            cropButton.addEventListener('click', function() {
+                if (!cropper) {
+                    showAvatarError('Pilih foto terlebih dahulu.');
+                    return;
+                }
+
+                const canvas = cropper.getCroppedCanvas({
+                    width: 250,
+                    height: 250,
+                    fillColor: '#fff',
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
+                });
+
+                if (!canvas) {
+                    showAvatarError('Foto gagal dipotong.');
+                    return;
+                }
+
+                const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                croppedAvatar.value = croppedDataUrl;
+                avatarPreview.src = croppedDataUrl;
+                uploadModal.hide();
+            });
+
+            uploadModalEl.addEventListener('hidden.bs.modal', function() {
+                destroyCropper();
+                image.removeAttribute('src');
+                inputImage.value = '';
+                clearAvatarError();
+            });
+        });
     </script>
 @endpush

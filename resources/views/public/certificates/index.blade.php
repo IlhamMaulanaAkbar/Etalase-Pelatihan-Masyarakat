@@ -49,7 +49,7 @@
         }
 
         .description {
-            font-size: 16px;
+            font-size: 14px;
             margin: 20px auto;
             max-width: 700px;
             line-height: 1.5;
@@ -57,7 +57,7 @@
         }
 
         .signature {
-            margin-top: 45px;
+            margin-top: 40px;
             text-align: right;
             margin-right: 80px;
         }

@@ -57,7 +57,7 @@
                                 <div class="mb-3">
                                     <label for="signature_file" class="form-label">File Tanda Tangan Pimpinan</label>
                                     <input type="file" class="form-control" id="signature_file" name="signature_file"
-                                        accept='.pdf,.docx,.pptx,.xlsx'>
+                                        accept='.png,.jpg,.jpeg'>
                                     @if ($certificate->signature_file)
                                         <small class="text-muted d-block mt-1">
                                             File saat ini:

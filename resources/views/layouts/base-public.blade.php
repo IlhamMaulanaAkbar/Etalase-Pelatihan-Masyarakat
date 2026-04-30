@@ -9,6 +9,8 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/cropper.min.css') }}">
+    @stack('styles')
 
 </head>
 

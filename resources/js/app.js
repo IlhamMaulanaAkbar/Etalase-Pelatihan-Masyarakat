@@ -4,7 +4,9 @@ window.jQuery = $;
 
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-
+import 'cropperjs/dist/cropper.css';
+import Cropper from 'cropperjs';
+window.Cropper = Cropper;
 import 'datatables.net-bs5';
 import 'datatables.net-responsive-bs5';
 import 'summernote/dist/summernote-bs5';

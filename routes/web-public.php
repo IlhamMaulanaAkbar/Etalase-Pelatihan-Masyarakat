@@ -42,6 +42,7 @@ Route::middleware(['auth:user'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('public.account.profile.index');
     Route::put('/profile', [ProfileController::class, 'update'])->name('public.account.profile.update');
     Route::post('/training/{training}/register', [TrainingController::class, 'register'])->name('public.training.register');
+    Route::post('/training/{training}/schedules/{schedule}/attendance', [TrainingController::class, 'storeAttendance'])->name('public.training.attendance.store');
     Route::get('/training/{training}/success', [TrainingController::class, 'success'])->name('public.training.success');
     Route::delete('/training/{training_user}', [TrainingController::class, 'destroy'])->name('public.training.destroy');
     Route::post('/assistance/{assistance}/register', [AssistanceController::class, 'register'])->name('public.assistance.register');

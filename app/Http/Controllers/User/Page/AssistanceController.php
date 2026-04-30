@@ -10,6 +10,7 @@ use App\Models\Training;
 use App\Models\AssistanceUser;
 use App\Services\Supports\Alert;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class AssistanceController extends Controller
 {
@@ -101,6 +102,13 @@ class AssistanceController extends Controller
         ]);
 
         session(['success_access_assistance_id' => $assistance->id]);
+        Carbon::setLocale('id');
+        session()->push('admin_notifications', [
+            'type' => 'assistance_registration',
+            'user_name' => $user->name,
+            'assistance_name' => $assistance->assistance_name,
+            'time' => now()->translatedFormat('d F Y H:i'),
+        ]);
 
         return redirect()->route('public.assistance.success', ['assistance' => $assistance->id]);
     }

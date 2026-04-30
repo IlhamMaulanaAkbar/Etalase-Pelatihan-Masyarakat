@@ -19,10 +19,12 @@ return Application::configure(basePath: dirname(__DIR__))
     })
 
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->redirectGuestsTo('auth.internal.login.index');
-
-        // Using a closure...
-        $middleware->redirectGuestsTo(fn(Request $request) => route('auth.internal.login.index'));
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('internal/*')) {
+                return route('auth.internal.login.index');
+            }
+            return route('auth.user.login.index');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

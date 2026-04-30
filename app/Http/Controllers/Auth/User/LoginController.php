@@ -10,6 +10,7 @@ use App\Services\Supports\Alert;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
 {
@@ -20,6 +21,16 @@ class LoginController extends Controller
 
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required',
+            'g-recaptcha-response' => 'required|captcha',
+        ]);
+
+        if ($validator->fails()) {
+            // Alert::error('Validasi gagal. Pastikan captcha sudah dicentang.');
+            return back()->withErrors($validator)->withInput();
+        }
         $credentials = $request->only('email', 'password');
 
         if (Auth::guard('user')->attempt($credentials)) {

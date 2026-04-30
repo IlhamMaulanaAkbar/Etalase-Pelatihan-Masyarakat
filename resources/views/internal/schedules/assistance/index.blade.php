@@ -14,7 +14,7 @@
                 <div class="card-body">
                     <h5 class="card-title fw-semibold mb-4">Materi Pendampingan</h5>
                     <div class="mb-3 text-end">
-                        <a href="{{ route('internal.lessons.assistance.create', ['assistance' => $assistance->id]) }}"
+                        <a href="{{ route('internal.schedules.assistance.create', ['assistance' => $assistance->id]) }}"
                             class="btn btn-primary">Tambah Materi Pendampingan</a>
                     </div>
                     @if (sizeof($lessons) > 0)
@@ -62,7 +62,7 @@
                                                 <p class="mb-0 fs-2 fw-normal">{{ $lesson->duration }} Jam</p>
                                             </td>
                                             <td class="text-center">
-                                                <a href="{{ route('internal.lessons.assistance.edit', ['assistance' => $assistance->id, 'lesson' => $lesson->id]) }}"
+                                                <a href="{{ route('internal.schedules.assistance.edit', ['assistance' => $assistance->id, 'lesson' => $lesson->id]) }}"
                                                     class="btn btn-primary btn-sm"><i class="ti ti-edit"></i></a>
 
                                                 <!-- Tombol hapus trigger modal -->
@@ -89,7 +89,7 @@
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <form
-                                                                    action="{{ route('internal.lessons.assistance.destroy', ['assistance' => $assistance->id, 'lesson' => $lesson->id]) }}"
+                                                                    action="{{ route('internal.schedules.assistance.destroy', ['assistance' => $assistance->id, 'lesson' => $lesson->id]) }}"
                                                                     method="POST">
                                                                     @csrf
                                                                     @method('DELETE')

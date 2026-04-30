@@ -58,7 +58,7 @@
                                             href="{{ route('internal.evaluations.instructor-evaluation.index', ['training' => $training->id]) }}">Evaluasi
                                             Instruktur</a></li>
                                     <li><a class="dropdown-item"
-                                            href="{{ route('internal.lessons.training.index', ['training' => $training->id]) }}">Materi
+                                            href="{{ route('internal.schedules.training.index', ['training' => $training->id]) }}">Jadwal
                                             Pelatihan</a></li>
                                     <li><a class="dropdown-item"
                                             href="{{ route('internal.certificates.index', ['training' => $training->id]) }}">Sertifikat
