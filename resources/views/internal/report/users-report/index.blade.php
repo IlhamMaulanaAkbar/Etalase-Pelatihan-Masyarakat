@@ -94,16 +94,16 @@
                                                 <p class="mb-0 fs-2 fw-normal">{{ $item->religion }}</p>
                                             </td>
                                             <td>
-                                                <p class="mb-0 fs-2 fw-normal">{{ $item->province }}</p>
+                                                <p class="mb-0 fs-2 fw-normal">{{ $item->nusaProvince?->name ?? '-' }}</p>
                                             </td>
                                             <td>
-                                                <p class="mb-0 fs-2 fw-normal">{{ $item->city }}</p>
+                                                <p class="mb-0 fs-2 fw-normal">{{ $item->nusaRegency?->name ?? '-' }}</p>
                                             </td>
                                             <td>
-                                                <p class="mb-0 fs-2 fw-normal">{{ $item->district }}</p>
+                                                <p class="mb-0 fs-2 fw-normal">{{ $item->nusaDistrict?->name ?? '-' }}</p>
                                             </td>
                                             <td>
-                                                <p class="mb-0 fs-2 fw-normal">{{ $item->village }}</p>
+                                                <p class="mb-0 fs-2 fw-normal">{{ $item->nusaVillage?->name ?? '-' }}</p>
                                             </td>
                                             <td>
                                                 <p class="mb-0 fs-2 fw-normal">{{ $item->job }}</p>

@@ -238,6 +238,9 @@ class TrainingController extends Controller
             'letter_statement' => 'required|file|mimes:pdf|max:2048',
             'letter_recommendation' => 'required|file|mimes:pdf|max:2048',
             'komitmen_check' => 'required'
+        ], [
+            'letter_statement.max' => 'File surat pernyataan tidak boleh lebih dari 2MB.',
+            'letter_recommendation.max' => 'File surat rekomendasi tidak boleh lebih dari 2MB.',
         ]);
 
         // Cek duplikat
@@ -250,7 +253,7 @@ class TrainingController extends Controller
         $recommendationPath = $request->file('letter_recommendation')->store('letters', 'public');
 
         // Buat no registrasi
-        $training_id_padded = str_pad($training->id, 8, '1', STR_PAD_LEFT);
+        $training_id_padded = str_pad($training->id, 8, '0', STR_PAD_LEFT);
         $user_id_padded = str_pad($user->id, 4, '0', STR_PAD_LEFT);
         $no_reg = 'PLT-' . $training_id_padded . '-' . $user_id_padded;
 
@@ -265,14 +268,16 @@ class TrainingController extends Controller
             'letter_recommendation' => $recommendationPath,
         ]);
 
-        Mail::to($user->email)->send(new TrainingRegistrationMail($user, $training, $no_reg));
+        Mail::to($user->email)->queue(new TrainingRegistrationMail($user, $training, $no_reg));
 
         session(['success_access_training_id' => $training->id]);
 
         Carbon::setLocale('id');
         session()->push('admin_notifications', [
             'type' => 'training_registration',
+            'user_id' => $user->id,
             'user_name' => $user->name,
+            'user_photo' => $user->photo,
             'training_name' => $training->training_name,
             'time' => Carbon::now()->translatedFormat('d F Y H:i'),
         ]);

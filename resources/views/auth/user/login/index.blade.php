@@ -60,7 +60,8 @@
                                     </div>
 
                                     <div class="d-flex align-items-center justify-content-end mb-4">
-                                        <a class="text-primary fw-bold" href="./index.html">Lupa Password ?</a>
+                                        <a class="text-primary fw-bold" href="{{ route('password.request') }}">Lupa
+                                            Password ?</a>
                                     </div>
                                     <button type="submit"
                                         class="btn btn-primary w-100 py-8 fs-4 rounded-2">Login</button>

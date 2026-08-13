@@ -10,10 +10,10 @@
             'place_of_birth',
             'phone',
             'gender',
-            'province',
-            'city',
-            'district',
-            'village',
+            'province_code',
+            'regency_code',
+            'district_code',
+            'village_code',
             'job',
             'education',
             'education_institutions',
@@ -144,7 +144,7 @@
                                             style="height: 100%; left: 0.5rem;"></div>
                                     @endif
 
-                                    @foreach ($schedules as $schedule)
+                                    @forelse ($schedules as $schedule)
                                         @php
                                             $attendance = $attendancesBySchedule->get($schedule->id);
                                             $attendanceWindow = $attendanceWindows->get($schedule->id);
@@ -187,142 +187,139 @@
                                                                     {{ $attendance->status }}</span>
                                                             @endif
                                                         </div>
-                                                        <div>
-                                                            <button type="button" class="btn btn-sm btn-outline-primary"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#scheduleDetailModal{{ $schedule->id }}">
-                                                                <i class="bi bi-eye"></i> Detail
-                                                            </button>
+                                                        @if ($isAcceptedParticipant)
+                                                            <div>
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-primary"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#scheduleDetailModal{{ $schedule->id }}">
+                                                                    <i class="bi bi-eye"></i> Detail
+                                                                </button>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @if ($isAcceptedParticipant)
+                                            <div class="modal fade" id="scheduleDetailModal{{ $schedule->id }}"
+                                                tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                    <div class="modal-content rounded-3">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Detail Pertemuan
+                                                                {{ $schedule->meeting_number }}</h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <dl class="row mb-0">
+                                                                <dt class="col-sm-4">Judul Pertemuan</dt>
+                                                                <dd class="col-sm-8">{{ $schedule->material_title }}</dd>
+
+                                                                <dt class="col-sm-4">Hari Pertemuan</dt>
+                                                                <dd class="col-sm-8">
+                                                                    {{ $schedule->date->translatedFormat('l, d F Y') }}</dd>
+
+                                                                <dt class="col-sm-4">Waktu Pertemuan</dt>
+                                                                <dd class="col-sm-8">
+                                                                    {{ substr($schedule->start_time, 0, 5) }}
+                                                                    - {{ substr($schedule->end_time, 0, 5) }} WITA</dd>
+
+                                                                <dt class="col-sm-4">Jam Pelajaran</dt>
+                                                                <dd class="col-sm-8">{{ $schedule->duration ?? '-' }} JP
+                                                                </dd>
+
+                                                                <dt class="col-sm-4">File Materi</dt>
+                                                                <dd class="col-sm-8">
+                                                                    @if ($schedule->file)
+                                                                        <a href="{{ asset('storage/' . $schedule->file) }}"
+                                                                            target="_blank"
+                                                                            class="btn btn-sm btn-outline-primary">
+                                                                            <i class="bi bi-file-earmark-text"></i> Lihat
+                                                                            File Materi
+                                                                        </a>
+                                                                    @else
+                                                                        <span class="text-muted">Belum ada file materi.</span>
+                                                                    @endif
+                                                                </dd>
+                                                            </dl>
+                                                            @if ($schedule->material_description)
+                                                                <div class="mt-3">
+                                                                    <div class="mt-3"> Deskripsi Materi
+                                                                    </div>
+                                                                    <p class="mb-0">{{ $schedule->material_description }}</p>
+                                                                </div>
+                                                            @endif
+
+                                                            <hr>
+
+                                                            <h6 class="fw-bold">Absensi</h6>
+                                                            @if ($attendance)
+                                                                <div class="alert alert-info">
+                                                                    Absensi saat ini:
+                                                                    <strong>{{ $attendance->status }}</strong>
+                                                                    @if ($attendance->attendance_time)
+                                                                        pada {{ substr($attendance->attendance_time, 0, 5) }}
+                                                                    @endif
+                                                                </div>
+                                                                <p class="text-muted mb-0">Absensi sudah dikirim dan tidak
+                                                                    dapat diubah kembali.</p>
+                                                            @elseif (!$attendanceWindow['has_started'])
+                                                                <div class="alert alert-warning mb-0">
+                                                                    Absensi belum dibuka. Absensi dibuka pada
+                                                                    {{ $attendanceWindow['starts_at']->format('d M Y H:i') }}.
+                                                                </div>
+                                                            @elseif ($attendanceWindow['has_ended'])
+                                                                <div class="alert alert-danger mb-0">
+                                                                    Absensi sudah ditutup pada
+                                                                    {{ $attendanceWindow['ends_at']->format('d M Y H:i') }}.
+                                                                    Peserta yang belum absen akan dianggap Tidak Hadir.
+                                                                </div>
+                                                            @else
+                                                                <form method="POST"
+                                                                    action="{{ route('public.training.attendance.store', [$training, $schedule]) }}">
+                                                                    @csrf
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Status Kehadiran</label>
+                                                                        <select name="status" class="form-select" required>
+                                                                            @foreach (['Hadir', 'Tidak Hadir', 'Izin', 'Sakit'] as $status)
+                                                                                <option value="{{ $status }}"
+                                                                                    @selected(old('status', 'Hadir') === $status)>
+                                                                                    {{ $status }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                        @error('status')
+                                                                            <div class="text-danger small mt-1">
+                                                                                {{ $message }}</div>
+                                                                        @enderror
+                                                                    </div>
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Catatan</label>
+                                                                        <textarea name="note" class="form-control" rows="3" placeholder="Opsional">{{ old('note') }}</textarea>
+                                                                        @error('note')
+                                                                            <div class="text-danger small mt-1">
+                                                                                {{ $message }}</div>
+                                                                        @enderror
+                                                                    </div>
+                                                                    <button type="submit"
+                                                                        class="btn btn-primary rounded-pill px-4">
+                                                                        Absen
+                                                                    </button>
+                                                                </form>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                        @endif
+                                    @empty
+                                        <div class="border-top border-bottom py-4 text-center">
+                                            <p class="mb-0">Tidak ada Jadwal Pelatihan Yang Tersedia.</p>
                                         </div>
-
-                                        <div class="modal fade" id="scheduleDetailModal{{ $schedule->id }}" tabindex="-1"
-                                            aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                <div class="modal-content rounded-3">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Detail Pertemuan
-                                                            {{ $schedule->meeting_number }}</h5>
-                                                        <button type="button" class="btn-close"
-                                                            data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <dl class="row mb-0">
-                                                            <dt class="col-sm-4">Judul Pertemuan</dt>
-                                                            <dd class="col-sm-8">{{ $schedule->material_title }}</dd>
-
-                                                            <dt class="col-sm-4">Hari Pertemuan</dt>
-                                                            <dd class="col-sm-8">
-                                                                {{ $schedule->date->translatedFormat('l, d F Y') }}</dd>
-
-                                                            <dt class="col-sm-4">Waktu Pertemuan</dt>
-                                                            <dd class="col-sm-8">{{ substr($schedule->start_time, 0, 5) }}
-                                                                - {{ substr($schedule->end_time, 0, 5) }} WITA</dd>
-
-                                                            <dt class="col-sm-4">Jam Pelajaran</dt>
-                                                            <dd class="col-sm-8">{{ $schedule->duration ?? '-' }} JP</dd>
-
-                                                            <dt class="col-sm-4">File Materi</dt>
-                                                            <dd class="col-sm-8">
-                                                                @if ($schedule->file)
-                                                                    <a href="{{ asset('storage/' . $schedule->file) }}"
-                                                                        target="_blank"
-                                                                        class="btn btn-sm btn-outline-primary">
-                                                                        <i class="bi bi-file-earmark-text"></i> Lihat File
-                                                                        Materi
-                                                                    </a>
-                                                                @else
-                                                                    <span class="text-muted">Belum ada file materi.</span>
-                                                                @endif
-                                                            </dd>
-                                                        </dl>
-                                                        @if ($schedule->material_description)
-                                                            <div class="mt-3">
-                                                                <div class="mt-3"> Deskripsi Materi
-                                                                </div>
-                                                                <p class="mb-0">{{ $schedule->material_description }}</p>
-                                                            </div>
-                                                        @endif
-
-                                                        <hr>
-
-                                                        <h6 class="fw-bold">Absensi</h6>
-                                                        @guest('user')
-                                                            <div class="alert alert-warning mb-0">
-                                                                Silakan login untuk melakukan absensi.
-                                                            </div>
-                                                        @elseauth('user')
-                                                            @if (!$isAcceptedParticipant)
-                                                                <div class="alert alert-warning mb-0">
-                                                                    Absensi hanya tersedia untuk peserta yang sudah diterima.
-                                                                </div>
-                                                            @else
-                                                                @if ($attendance)
-                                                                    <div class="alert alert-info">
-                                                                        Absensi saat ini:
-                                                                        <strong>{{ $attendance->status }}</strong>
-                                                                        @if ($attendance->attendance_time)
-                                                                            pada
-                                                                            {{ substr($attendance->attendance_time, 0, 5) }}
-                                                                        @endif
-                                                                    </div>
-                                                                    <p class="text-muted mb-0">Absensi sudah dikirim dan tidak
-                                                                        dapat diubah kembali.</p>
-                                                                @elseif (!$attendanceWindow['has_started'])
-                                                                    <div class="alert alert-warning mb-0">
-                                                                        Absensi belum dibuka. Absensi dibuka pada
-                                                                        {{ $attendanceWindow['starts_at']->format('d M Y H:i') }}.
-                                                                    </div>
-                                                                @elseif ($attendanceWindow['has_ended'])
-                                                                    <div class="alert alert-danger mb-0">
-                                                                        Absensi sudah ditutup pada
-                                                                        {{ $attendanceWindow['ends_at']->format('d M Y H:i') }}.
-                                                                        Peserta yang belum absen akan dianggap Tidak Hadir.
-                                                                    </div>
-                                                                @else
-                                                                    <form method="POST"
-                                                                        action="{{ route('public.training.attendance.store', [$training, $schedule]) }}">
-                                                                        @csrf
-                                                                        <div class="mb-3">
-                                                                            <label class="form-label">Status Kehadiran</label>
-                                                                            <select name="status" class="form-select"
-                                                                                required>
-                                                                                @foreach (['Hadir', 'Tidak Hadir', 'Izin', 'Sakit'] as $status)
-                                                                                    <option value="{{ $status }}"
-                                                                                        @selected(old('status', 'Hadir') === $status)>
-                                                                                        {{ $status }}
-                                                                                    </option>
-                                                                                @endforeach
-                                                                            </select>
-                                                                            @error('status')
-                                                                                <div class="text-danger small mt-1">
-                                                                                    {{ $message }}</div>
-                                                                            @enderror
-                                                                        </div>
-                                                                        <div class="mb-3">
-                                                                            <label class="form-label">Catatan</label>
-                                                                            <textarea name="note" class="form-control" rows="3" placeholder="Opsional">{{ old('note') }}</textarea>
-                                                                            @error('note')
-                                                                                <div class="text-danger small mt-1">
-                                                                                    {{ $message }}</div>
-                                                                            @enderror
-                                                                        </div>
-                                                                        <button type="submit"
-                                                                            class="btn btn-primary rounded-pill px-4">
-                                                                            Absen
-                                                                        </button>
-                                                                    </form>
-                                                                @endif
-                                                            @endif
-                                                        @endauth
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
+                                    @endforelse
                                 </div>
                                 {{-- @else
                                     <div class="text-center py-5">
@@ -371,6 +368,12 @@
                                     <div id="errorRecommendationFormat" class="text-danger mt-1 d-none">
                                         File harus berupa PDF.
                                     </div>
+                                    <div id="errorRecommendationSize" class="text-danger mt-1 d-none">
+                                        File tidak boleh lebih dari 2MB.
+                                    </div>
+                                    @error('letter_recommendation')
+                                        <div class="text-danger mt-1">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Surat Pernyataan</label>
@@ -383,6 +386,12 @@
                                     <div id="errorStatementFormat" class="text-danger mt-1 d-none">
                                         File harus berupa PDF.
                                     </div>
+                                    <div id="errorStatementSize" class="text-danger mt-1 d-none">
+                                        File tidak boleh lebih dari 2MB.
+                                    </div>
+                                    @error('letter_statement')
+                                        <div class="text-danger mt-1">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <!-- Hidden field untuk komitmen -->
@@ -605,6 +614,49 @@
             const btnSubmit = document.getElementById('btnSubmitForm');
             const komitmenCheck = document.getElementById('komitmenCheck');
             const hiddenKomitmen = document.getElementById('hiddenKomitmen');
+            const statement = formElement?.querySelector('input[name="letter_statement"]');
+            const recommendation = formElement?.querySelector('input[name="letter_recommendation"]');
+            const errorStatement = document.getElementById('errorStatement');
+            const errorStatementFormat = document.getElementById('errorStatementFormat');
+            const errorStatementSize = document.getElementById('errorStatementSize');
+            const errorRecommendation = document.getElementById('errorRecommendation');
+            const errorRecommendationFormat = document.getElementById('errorRecommendationFormat');
+            const errorRecommendationSize = document.getElementById('errorRecommendationSize');
+            const maxPdfSize = 2 * 1024 * 1024;
+
+            function isPdfFile(file) {
+                return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            }
+
+            function validatePdfInput(input, requiredError, formatError, sizeError, rejectOversized = false) {
+                requiredError.classList.add('d-none');
+                formatError.classList.add('d-none');
+                sizeError.classList.add('d-none');
+
+                if (!input.files.length) {
+                    requiredError.classList.remove('d-none');
+                    return false;
+                }
+
+                const file = input.files[0];
+
+                if (!isPdfFile(file)) {
+                    formatError.classList.remove('d-none');
+                    return false;
+                }
+
+                if (file.size > maxPdfSize) {
+                    sizeError.classList.remove('d-none');
+
+                    if (rejectOversized) {
+                        input.value = '';
+                    }
+
+                    return false;
+                }
+
+                return true;
+            }
 
             // Menampilkan form pendaftaran dari tombol di luar (misal: #btnDaftarAjax)
             document.getElementById('btnDaftarAjax')?.addEventListener('click', function() {
@@ -619,53 +671,21 @@
 
             // Navigasi ke form komitmen
             btnLanjut?.addEventListener('click', function() {
-                const statement = formElement.querySelector('input[name="letter_statement"]');
-                const recommendation = formElement.querySelector('input[name="letter_recommendation"]');
-                const formSection = document.getElementById('formPendaftaranSection');
-                const formKomitmen = document.getElementById('form-komitmen');
-
-                // Error messages
-                const errorStatement = document.getElementById('errorStatement');
-                const errorStatementFormat = document.getElementById('errorStatementFormat');
-                const errorRecommendation = document.getElementById('errorRecommendation');
-                const errorRecommendationFormat = document.getElementById('errorRecommendationFormat');
-
-                let isValid = true;
-
-                // ===== Validasi Surat Pernyataan =====
-                if (!statement.files.length) {
-                    errorStatement.classList.remove('d-none');
-                    isValid = false;
-                } else {
-                    errorStatement.classList.add('d-none');
-
-                    const file = statement.files[0];
-                    if (file.type !== 'application/pdf') {
-                        errorStatementFormat.classList.remove('d-none');
-                        isValid = false;
-                    } else {
-                        errorStatementFormat.classList.add('d-none');
-                    }
-                }
-
-                // ===== Validasi Surat Rekomendasi =====
-                if (!recommendation.files.length) {
-                    errorRecommendation.classList.remove('d-none');
-                    isValid = false;
-                } else {
-                    errorRecommendation.classList.add('d-none');
-
-                    const file = recommendation.files[0];
-                    if (file.type !== 'application/pdf') {
-                        errorRecommendationFormat.classList.remove('d-none');
-                        isValid = false;
-                    } else {
-                        errorRecommendationFormat.classList.add('d-none');
-                    }
-                }
+                const isStatementValid = validatePdfInput(
+                    statement,
+                    errorStatement,
+                    errorStatementFormat,
+                    errorStatementSize
+                );
+                const isRecommendationValid = validatePdfInput(
+                    recommendation,
+                    errorRecommendation,
+                    errorRecommendationFormat,
+                    errorRecommendationSize
+                );
 
                 // ===== Tampilkan form komitmen jika valid =====
-                if (isValid) {
+                if (isStatementValid && isRecommendationValid) {
                     formSection.classList.add('d-none');
                     formKomitmen.classList.remove('d-none');
                 }
@@ -706,19 +726,22 @@
                     errorMsg.classList.add('d-none');
                 }
             });
-            statement?.addEventListener('change', () => {
-                if (statement.files.length && statement.files[0].type === 'application/pdf') {
-                    errorStatement.classList.add('d-none');
-                    errorStatementFormat.classList.add('d-none');
-                }
-            });
 
-            recommendation?.addEventListener('change', () => {
-                if (recommendation.files.length && recommendation.files[0].type === 'application/pdf') {
-                    errorRecommendation.classList.add('d-none');
-                    errorRecommendationFormat.classList.add('d-none');
-                }
-            });
+            statement?.addEventListener('change', () => validatePdfInput(
+                statement,
+                errorStatement,
+                errorStatementFormat,
+                errorStatementSize,
+                true
+            ));
+
+            recommendation?.addEventListener('change', () => validatePdfInput(
+                recommendation,
+                errorRecommendation,
+                errorRecommendationFormat,
+                errorRecommendationSize,
+                true
+            ));
 
         });
         document.addEventListener("DOMContentLoaded", function() {

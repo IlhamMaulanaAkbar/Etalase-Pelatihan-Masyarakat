@@ -24,6 +24,7 @@ class RegisterController extends Controller
         $user->role = 'user';
 
         $user->save();
+
         Alert::success('Pendaftaran berhasil. Silahkan masuk menggunakan email dan kata sandi yang telah dibuat.');
         return redirect()->route('auth.user.login.index');
     }

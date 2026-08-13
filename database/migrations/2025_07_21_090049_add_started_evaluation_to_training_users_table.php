@@ -11,10 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('training_users', function (Blueprint $table) {
-            $table->boolean('started_training_evaluation')->default(false)->after('started_posttest');
-            $table->boolean('started_instructor_evaluation')->default(false)->after('started_training_evaluation');
-        });
+        if (! Schema::hasColumn('training_users', 'started_training_evaluation')) {
+            Schema::table('training_users', function (Blueprint $table) {
+                $table->boolean('started_training_evaluation')->default(false)->after('started_posttest');
+            });
+        }
+
+        if (! Schema::hasColumn('training_users', 'started_instructor_evaluation')) {
+            Schema::table('training_users', function (Blueprint $table) {
+                $table->boolean('started_instructor_evaluation')->default(false)->after('started_training_evaluation');
+            });
+        }
     }
 
     /**

@@ -45,8 +45,13 @@ class Assistance extends Model
         return $this->hasMany(AssistanceUser::class, 'assistance_id');
     }
 
-    public function lessonsAssistance()
+    public function assistanceSchedules()
     {
-        return $this->hasMany(LessonsAssistance::class, 'assistance_id');
+        return $this->hasMany(AssistanceSchedule::class, 'assistance_id');
+    }
+
+    public function assistanceAttendances()
+    {
+        return $this->hasMany(AssistanceAttendance::class, 'assistance_id');
     }
 }

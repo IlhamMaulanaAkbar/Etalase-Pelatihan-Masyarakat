@@ -73,6 +73,39 @@
 
                 <li class="nav-small-cap">
                     <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                    <span class="hide-menu">Template Soal & Evaluasi</span>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('internal.templates.assessments.index', ['templateType' => 'pre-test']) }}"
+                        aria-expanded="false">
+                        <span><i class="ti ti-list-check"></i></span>
+                        <span class="hide-menu">Template Pre Test</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('internal.templates.assessments.index', ['templateType' => 'post-test']) }}"
+                        aria-expanded="false">
+                        <span><i class="ti ti-list-details"></i></span>
+                        <span class="hide-menu">Template Post Test</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('internal.templates.assessments.index', ['templateType' => 'training-evaluation']) }}"
+                        aria-expanded="false">
+                        <span><i class="ti ti-clipboard-list"></i></span>
+                        <span class="hide-menu text-wrap">Template Evaluasi Pelatihan</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{ route('internal.templates.assessments.index', ['templateType' => 'instructor-evaluation']) }}"
+                        aria-expanded="false">
+                        <span><i class="ti ti-clipboard-list"></i></span>
+                        <span class="hide-menu text-wrap">Template Evaluasi Instruktur</span>
+                    </a>
+                </li>
+
+                <li class="nav-small-cap">
+                    <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
                     <span class="hide-menu">Evaluasi</span>
                 </li>
                 <li class="sidebar-item">

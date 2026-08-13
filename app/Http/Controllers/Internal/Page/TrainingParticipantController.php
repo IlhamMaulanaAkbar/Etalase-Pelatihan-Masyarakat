@@ -11,6 +11,8 @@ use App\Models\PreTestUsersAnswers;
 use App\Models\PreTestAnswers;
 use App\Models\PostTestUsersAnswers;
 use App\Models\PostTestAnswers;
+use App\Mail\TrainingAcceptedMail;
+use Illuminate\Support\Facades\Mail;
 
 class TrainingParticipantController extends Controller
 {
@@ -24,8 +26,10 @@ class TrainingParticipantController extends Controller
     {
         $participants = $training->training_users()->with('user')->get();
 
-        $preTestQuestionIds = $training->preTestQuestions->pluck('id');
-        $postTestQuestionsIds = $training->postTestQuestions->pluck('id');
+        $preTestQuestions = $training->preTestQuestions()->with('answers')->get();
+        $postTestQuestions = $training->postTestQuestions()->with('answers')->get();
+        $preTestQuestionIds = $preTestQuestions->pluck('id');
+        $postTestQuestionsIds = $postTestQuestions->pluck('id');
 
         foreach ($participants as $participant) {
             // PRE-TEST
@@ -81,9 +85,64 @@ class TrainingParticipantController extends Controller
             } else {
                 $participant->post_test_score = null; // belum mengerjakan
             }
+
+            $participant->pre_test_detail = $this->buildPreTestDetail(
+                $preTestQuestions,
+                $participant->user_id
+            );
+            $participant->post_test_detail = $this->buildPostTestDetail(
+                $postTestQuestions,
+                $participant->user_id
+            );
         }
 
         return view('internal.participants.training.show', compact('training', 'participants'));
+    }
+
+    private function buildPreTestDetail($questions, int $userId): array
+    {
+        $userAnswers = PreTestUsersAnswers::where('users_id', $userId)
+            ->whereIn('pre_test_questions_id', $questions->pluck('id'))
+            ->get()
+            ->keyBy('pre_test_questions_id');
+
+        return $this->buildAssessmentDetail($questions, $userAnswers);
+    }
+
+    private function buildPostTestDetail($questions, int $userId): array
+    {
+        $userAnswers = PostTestUsersAnswers::where('users_id', $userId)
+            ->whereIn('post_test_questions_id', $questions->pluck('id'))
+            ->get()
+            ->keyBy('post_test_questions_id');
+
+        return $this->buildAssessmentDetail($questions, $userAnswers);
+    }
+
+    private function buildAssessmentDetail($questions, $userAnswers): array
+    {
+        $items = $questions->map(function ($question) use ($userAnswers) {
+            $correctAnswer = $question->answers->firstWhere('is_correct', true);
+            $userAnswer = $userAnswers->get($question->id);
+            $isAnswered = $userAnswer && $userAnswer->answer !== null;
+            $isCorrect = $isAnswered && $correctAnswer && $userAnswer->answer === $correctAnswer->answer;
+
+            return [
+                'question' => $question->question,
+                'correct_answer' => $correctAnswer?->answer,
+                'user_answer' => $userAnswer?->answer,
+                'is_answered' => $isAnswered,
+                'is_correct' => $isCorrect,
+            ];
+        });
+
+        return [
+            'total' => $items->count(),
+            'correct' => $items->where('is_correct', true)->count(),
+            'wrong' => $items->where('is_answered', true)->where('is_correct', false)->count(),
+            'unanswered' => $items->where('is_answered', false)->count(),
+            'items' => $items,
+        ];
     }
 
 
@@ -104,6 +163,20 @@ class TrainingParticipantController extends Controller
             $training_user->verified_at = now();
         }
         $training_user->save();
+
+        if ($request->status === 'LULUS') {
+            $training_user->loadMissing(['user', 'training']);
+
+            if ($training_user->user && $training_user->user->email) {
+                Mail::to($training_user->user->email)->queue(
+                    new TrainingAcceptedMail(
+                        $training_user->user,
+                        $training_user->training,
+                        $training_user->registration_number
+                    )
+                );
+            }
+        }
 
         return back()->with(Alert::success('Status peserta berhasil diperbarui.'));
     }

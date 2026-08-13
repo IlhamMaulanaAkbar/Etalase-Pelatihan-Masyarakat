@@ -42,12 +42,6 @@
                                         <th>
                                             <h6 class="fs-2 fw-semibold mb-0">Aksi</h6>
                                         </th>
-                                        <th>
-                                            <h6 class="fs-2 fw-semibold mb-0">Waktu Verifikasi</h6>
-                                        </th>
-                                        <th>
-                                            <h6 class="fs-2 fw-semibold mb-0">Profil Peserta</h6>
-                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -86,57 +80,123 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                @if ($participant->status == 'LULUS')
-                                                    <span
-                                                        class="badge bg-success rounded-pill px-4 py-2 fs-2">Diterima</span>
-                                                @elseif ($participant->status == 'TIDAK_LULUS')
-                                                    <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Ditolak</span>
-                                                @elseif ($participant->status == 'BATAL')
-                                                    <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Dibatalkan
-                                                        oleh Peserta</span>
-                                                @else
-                                                    <span
-                                                        class="badge bg-warning rounded-pill px-4 py-2 fs-2">Menunggu</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($participant->status === 'DAFTAR')
-                                                    <form method="POST"
-                                                        action="{{ route('internal.training.participants.status', ['training_user' => $participant->id]) }}">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <select name="status"
-                                                                class="form-select form-select-sm w-auto">
-                                                                <option value="" disabled selected>Pilih Status
-                                                                </option>
-                                                                <option value="LULUS">TERIMA</option>
-                                                                <option value="TIDAK_LULUS">TOLAK</option>
-                                                            </select>
-                                                            <button type="submit"
-                                                                class="btn btn-sm btn-success">Update</button>
-                                                        </div>
-                                                    </form>
-                                                @else
-                                                    <span class="text-muted small">Status telah diproses</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($participant->verified_at)
-                                                    <p class="mb-0 fs-2 fw-normal">
-                                                        {{ $participant->verified_at->format('d M Y H:i') }}
-                                                    </p>
-                                                @else
-                                                    <p class="text-muted mb-0 fs-2 fw-normal">Belum diverifikasi</p>
-                                                @endif
-                                            </td>
+                                                <div class="d-flex align-items-center gap-2" style="min-width: 300px;">
+                                                    @if ($participant->status == 'LULUS')
+                                                        <span
+                                                            class="badge bg-success rounded-pill px-4 py-2 fs-2">Diterima</span>
+                                                    @elseif ($participant->status == 'TIDAK_LULUS')
+                                                        <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Ditolak</span>
+                                                    @elseif ($participant->status == 'BATAL')
+                                                        <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Dibatalkan
+                                                            oleh Peserta</span>
+                                                    @else
+                                                        <span
+                                                            class="badge bg-warning rounded-pill px-4 py-2 fs-2">Menunggu</span>
+                                                    @endif
 
-                                            <!-- Tombol Detail -->
+                                                    @if ($participant->status === 'DAFTAR')
+                                                        <form method="POST" class="mb-0"
+                                                            action="{{ route('internal.training.participants.status', ['training_user' => $participant->id]) }}">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <select name="status"
+                                                                    class="form-select form-select-sm w-auto">
+                                                                    <option value="" disabled selected>Pilih Status
+                                                                    </option>
+                                                                    <option value="LULUS">TERIMA</option>
+                                                                    <option value="TIDAK_LULUS">TOLAK</option>
+                                                                </select>
+                                                                <button type="submit"
+                                                                    class="btn btn-sm btn-success">Update</button>
+                                                            </div>
+                                                        </form>
+                                                    @endif
+                                                </div>
+                                            </td>
                                             <td>
-                                                <button class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                                    data-bs-target="#detailModal{{ $participant->id }}">
-                                                    Detail
-                                                </button>
+                                                <div class="d-flex align-items-center gap-2" style="min-width: 78px;">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-info rounded-circle d-inline-flex align-items-center justify-content-center"
+                                                            style="width: 34px; height: 34px;"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#detailModal{{ $participant->id }}"
+                                                            title="Detail Profil"
+                                                            aria-label="Detail Profil {{ $participant->user->name }}">
+                                                            <i class="ti ti-user fs-4"></i>
+                                                        </button>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-primary rounded-circle d-inline-flex align-items-center justify-content-center"
+                                                            style="width: 34px; height: 34px;"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#scoreDetailModal{{ $participant->id }}"
+                                                            title="Detail Nilai"
+                                                            aria-label="Detail Nilai {{ $participant->user->name }}">
+                                                            <i class="ti ti-chart-bar fs-4"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal fade" id="scoreDetailModal{{ $participant->id }}"
+                                                    tabindex="-1"
+                                                    aria-labelledby="scoreDetailModalLabel{{ $participant->id }}"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                                                        <div class="modal-content border-0 shadow-lg">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title"
+                                                                    id="scoreDetailModalLabel{{ $participant->id }}">
+                                                                    Detail Nilai - {{ $participant->user->name }}
+                                                                </h5>
+                                                                <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <ul class="nav nav-tabs mb-3" role="tablist">
+                                                                    <li class="nav-item" role="presentation">
+                                                                        <button class="nav-link active"
+                                                                            data-bs-toggle="tab"
+                                                                            data-bs-target="#preScore{{ $participant->id }}"
+                                                                            type="button" role="tab">
+                                                                            Pre-Test
+                                                                        </button>
+                                                                    </li>
+                                                                    <li class="nav-item" role="presentation">
+                                                                        <button class="nav-link" data-bs-toggle="tab"
+                                                                            data-bs-target="#postScore{{ $participant->id }}"
+                                                                            type="button" role="tab">
+                                                                            Post-Test
+                                                                        </button>
+                                                                    </li>
+                                                                </ul>
+
+                                                                <div class="tab-content">
+                                                                    <div class="tab-pane fade show active"
+                                                                        id="preScore{{ $participant->id }}" role="tabpanel">
+                                                                        @include('internal.participants.training.partials.score-detail', [
+                                                                            'detail' => $participant->pre_test_detail,
+                                                                            'score' => $participant->pre_test_score,
+                                                                            'title' => 'Pre-Test',
+                                                                        ])
+                                                                    </div>
+                                                                    <div class="tab-pane fade"
+                                                                        id="postScore{{ $participant->id }}" role="tabpanel">
+                                                                        @include('internal.participants.training.partials.score-detail', [
+                                                                            'detail' => $participant->post_test_detail,
+                                                                            'score' => $participant->post_test_score,
+                                                                            'title' => 'Post-Test',
+                                                                        ])
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-outline-secondary"
+                                                                    data-bs-dismiss="modal">Tutup</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                                                 <!-- Modal Detail -->
                                                 <div class="modal fade" id="detailModal{{ $participant->id }}"
@@ -150,6 +210,26 @@
                                                             </div>
                                                             <div class="modal-body">
                                                                 <div class="container">
+                                                                    <div class="text-center mb-4">
+                                                                        <img src="{{ $participant->user->photo ? asset('storage/' . $participant->user->photo) : asset('assets/images/profile/user-1.jpg') }}"
+                                                                            alt="Foto Profil {{ $participant->user->name }}"
+                                                                            class="rounded-circle border shadow-sm"
+                                                                            width="120" height="120"
+                                                                            style="object-fit: cover;">
+                                                                        <h6 class="fw-semibold mt-3 mb-0">
+                                                                            {{ $participant->user->name }}
+                                                                        </h6>
+                                                                    </div>
+
+                                                                    <div class="row mb-3">
+                                                                        <div class="col-md-6">
+                                                                            <p class="mb-1 text-muted">Waktu Verifikasi</p>
+                                                                            <p class="fw-semibold">
+                                                                                {{ $participant->verified_at ? $participant->verified_at->format('d M Y H:i') : 'Belum diverifikasi' }}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+
                                                                     <div class="row">
                                                                         <div class="col-md-6">
                                                                             <p class="mb-1 text-muted">Nama Lengkap</p>
@@ -196,22 +276,22 @@
                                                                         <div class="col-md-6">
                                                                             <p class="mb-1 text-muted">Provinsi</p>
                                                                             <p class="fw-semibold">
-                                                                                {{ $participant->user->province }}</p>
+                                                                                {{ $participant->user->nusaProvince?->name ?? '-' }}</p>
                                                                         </div>
                                                                         <div class="col-md-6">
                                                                             <p class="mb-1 text-muted">Kota/Kab</p>
                                                                             <p class="fw-semibold">
-                                                                                {{ $participant->user->city }}</p>
+                                                                                {{ $participant->user->nusaRegency?->name ?? '-' }}</p>
                                                                         </div>
                                                                         <div class="col-md-6">
                                                                             <p class="mb-1 text-muted">Kecamatan</p>
                                                                             <p class="fw-semibold">
-                                                                                {{ $participant->user->district }}</p>
+                                                                                {{ $participant->user->nusaDistrict?->name ?? '-' }}</p>
                                                                         </div>
                                                                         <div class="col-md-6">
                                                                             <p class="mb-1 text-muted">Desa/Kelurahan</p>
                                                                             <p class="fw-semibold">
-                                                                                {{ $participant->user->village }}</p>
+                                                                                {{ $participant->user->nusaVillage?->name ?? '-' }}</p>
                                                                         </div>
                                                                     </div>
 

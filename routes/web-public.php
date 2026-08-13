@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\User\Page\AboutController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\User\EmailVerificationController;
+use App\Http\Controllers\Auth\User\ForgotPasswordController;
 use App\Http\Controllers\Auth\User\LoginController;
+use App\Http\Controllers\Auth\User\PasswordController;
 use App\Http\Controllers\Auth\User\RegisterController;
 use App\Http\Controllers\Internal\Page\InstructorEvaluationController;
 use App\Http\Controllers\User\Home\DashboardController;
@@ -35,17 +38,36 @@ Route::middleware(['guest:user'])->group(function () {
 
     Route::get('login/oauth/{provider}', [LoginController::class, 'oAuthRedirect'])->name('auth.user.login.oauth.redirect');
     Route::get('login/oauth/{provider}/callback', [LoginController::class, 'oAuthCallback'])->name('auth.user.login.oauth.callback');
+
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'request'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'email'])->name('password.email');
+    Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'reset'])->name('password.reset');
+    Route::post('/reset-password', [ForgotPasswordController::class, 'store'])->name('password.store');
 });
 
 Route::middleware(['auth:user'])->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('auth.user.logout.destroy');
+
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'send'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+
     Route::get('/profile', [ProfileController::class, 'index'])->name('public.account.profile.index');
     Route::put('/profile', [ProfileController::class, 'update'])->name('public.account.profile.update');
+    Route::put('/profile/change-password', [PasswordController::class, 'update'])->name('password.update');
+    Route::get('/profile/connect/{provider}', [LoginController::class, 'connectOAuthRedirect'])->name('auth.user.oauth.connect.redirect');
+    Route::get('/profile/connect/{provider}/callback', [LoginController::class, 'connectOAuthCallback'])->name('auth.user.oauth.connect.callback');
+    Route::delete('/profile/connect/{provider}', [LoginController::class, 'disconnectOAuth'])->name('auth.user.oauth.disconnect');
     Route::post('/training/{training}/register', [TrainingController::class, 'register'])->name('public.training.register');
     Route::post('/training/{training}/schedules/{schedule}/attendance', [TrainingController::class, 'storeAttendance'])->name('public.training.attendance.store');
     Route::get('/training/{training}/success', [TrainingController::class, 'success'])->name('public.training.success');
     Route::delete('/training/{training_user}', [TrainingController::class, 'destroy'])->name('public.training.destroy');
     Route::post('/assistance/{assistance}/register', [AssistanceController::class, 'register'])->name('public.assistance.register');
+    Route::post('/assistance/{assistance}/schedules/{schedule}/attendance', [AssistanceController::class, 'storeAttendance'])->name('public.assistance.attendance.store');
     Route::get('/assistance/{assistance}/success', [AssistanceController::class, 'success'])->name('public.assistance.success');
     Route::delete('/assistance/{assistance_user}', [AssistanceController::class, 'destroy'])->name('public.assistance.destroy');
 

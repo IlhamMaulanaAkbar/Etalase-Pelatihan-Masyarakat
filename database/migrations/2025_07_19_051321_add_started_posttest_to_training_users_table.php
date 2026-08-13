@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('training_users', function (Blueprint $table) {
-            $table->boolean('started_posttest')->default(false)->after('started_pretest');
-        });
+        if (! Schema::hasColumn('training_users', 'started_posttest')) {
+            Schema::table('training_users', function (Blueprint $table) {
+                $table->boolean('started_posttest')->default(false)->after('started_pretest');
+            });
+        }
     }
 
     /**

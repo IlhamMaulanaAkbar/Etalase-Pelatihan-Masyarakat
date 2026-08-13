@@ -41,22 +41,6 @@
                                     <i class="ti ti-square-plus fs-4 me-2"></i>Tambah
                                 </button>
                                 <ul class="dropdown-menu animated flipInX">
-                                    <li>
-                                        <a class="dropdown-item"
-                                            href="{{ route('internal.test-assessment.pre-test.index', ['training' => $training->id]) }}">Pre
-                                            Test</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item"
-                                            href="{{ route('internal.test-assessment.post-test.index', ['training' => $training->id]) }}">Post
-                                            Test</a>
-                                    </li>
-                                    <li><a class="dropdown-item"
-                                            href="{{ route('internal.evaluations.training-evaluation.index', ['training' => $training->id]) }}">Evaluasi
-                                            Pelatihan</a></li>
-                                    <li><a class="dropdown-item"
-                                            href="{{ route('internal.evaluations.instructor-evaluation.index', ['training' => $training->id]) }}">Evaluasi
-                                            Instruktur</a></li>
                                     <li><a class="dropdown-item"
                                             href="{{ route('internal.schedules.training.index', ['training' => $training->id]) }}">Jadwal
                                             Pelatihan</a></li>

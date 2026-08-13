@@ -25,10 +25,10 @@ return new class extends Migration
             $table->string('phone', 255)->nullable();
             $table->timestamp('phone_verified_at')->nullable();
             $table->enum('gender', ['Laki-laki', 'Perempuan'])->nullable();
-            $table->string('province', 128)->nullable();
-            $table->string('city', 128)->nullable();
-            $table->string('district', 128)->nullable();
-            $table->string('village', 128)->nullable();
+            $table->string('province_code', 2)->nullable()->index();
+            $table->string('regency_code', 5)->nullable()->index();
+            $table->string('district_code', 8)->nullable()->index();
+            $table->string('village_code', 13)->nullable()->index();
             $table->string('job', 255)->nullable();
             $table->string('education', 255)->nullable();
             $table->string('education_institutions', 255)->nullable();

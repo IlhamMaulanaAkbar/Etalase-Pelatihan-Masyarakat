@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\EnsureTokenIsValid;
+use App\Http\Middleware\VerifyEmail;
 use Illuminate\Foundation\Configuration\Schedule;
 use Illuminate\Http\Request;
 
@@ -19,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
     })
 
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'verified.user' => VerifyEmail::class,
+        ]);
+
         $middleware->redirectGuestsTo(function (Request $request) {
             if ($request->is('internal/*')) {
                 return route('auth.internal.login.index');

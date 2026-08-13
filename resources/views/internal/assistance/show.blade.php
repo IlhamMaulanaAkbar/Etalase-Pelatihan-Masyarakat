@@ -41,7 +41,7 @@
                                 </button>
                                 <ul class="dropdown-menu animated flipInX">
                                     <li><a class="dropdown-item"
-                                            href="{{ route('internal.schedules.assistance.index', ['assistance' => $assistance->id]) }}">Materi
+                                            href="{{ route('internal.schedules.assistance.index', ['assistance' => $assistance->id]) }}">Jadwal
                                             Pendampingan</a>
                                     </li>
                                 </ul>

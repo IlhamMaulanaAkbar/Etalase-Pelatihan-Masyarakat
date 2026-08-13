@@ -30,12 +30,6 @@
                                         <th>
                                             <h6 class="fs-2 fw-semibold mb-0">Aksi</h6>
                                         </th>
-                                        <th>
-                                            <h6 class="fs-2 fw-semibold mb-0">Waktu Verifikasi</h6>
-                                        </th>
-                                        <th>
-                                            <h6 class="fs-2 fw-semibold mb-0">Profil Peserta</h6>
-                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -48,56 +42,54 @@
                                                 <p class="mb-0 fs-2 fw-normal">{{ $participant->user->name }}</p>
                                             </td>
                                             <td>
-                                                @if ($participant->status == 'LULUS')
-                                                    <span
-                                                        class="badge bg-success rounded-pill px-4 py-2 fs-2">Diterima</span>
-                                                @elseif ($participant->status == 'TIDAK_LULUS')
-                                                    <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Ditolak</span>
-                                                @elseif ($participant->status == 'BATAL')
-                                                    <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Dibatalkan
-                                                        oleh Peserta</span>
-                                                @else
-                                                    <span
-                                                        class="badge bg-warning rounded-pill px-4 py-2 fs-2">Menunggu</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($participant->status === 'DAFTAR')
-                                                    <form method="POST"
-                                                        action="{{ route('internal.assistance.participants.status', ['assistance_user' => $participant->id]) }}">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <select name="status"
-                                                                class="form-select form-select-sm w-auto">
-                                                                <option value="" disabled selected>Pilih Status
-                                                                </option>
-                                                                <option value="LULUS">TERIMA</option>
-                                                                <option value="TIDAK_LULUS">TOLAK</option>
-                                                            </select>
-                                                            <button type="submit"
-                                                                class="btn btn-sm btn-success">Update</button>
-                                                        </div>
-                                                    </form>
-                                                @else
-                                                    <span class="text-muted small">Status telah diproses</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($participant->verified_at)
-                                                    <p class="mb-0 fs-2 fw-normal user-time" data-time="{{ $participant->verified_at }}">
-                                                    </p>
-                                                @else
-                                                    <p class="text-muted mb-0 fs-2 fw-normal">Belum diverifikasi</p>
-                                                @endif
-                                            </td>
+                                                <div class="d-flex align-items-center gap-2" style="min-width: 300px;">
+                                                    @if ($participant->status == 'LULUS')
+                                                        <span
+                                                            class="badge bg-success rounded-pill px-4 py-2 fs-2">Diterima</span>
+                                                    @elseif ($participant->status == 'TIDAK_LULUS')
+                                                        <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Ditolak</span>
+                                                    @elseif ($participant->status == 'BATAL')
+                                                        <span class="badge bg-danger rounded-pill px-4 py-2 fs-2">Dibatalkan
+                                                            oleh Peserta</span>
+                                                    @else
+                                                        <span
+                                                            class="badge bg-warning rounded-pill px-4 py-2 fs-2">Menunggu</span>
+                                                    @endif
 
-                                            <!-- Tombol Detail -->
+                                                    @if ($participant->status === 'DAFTAR')
+                                                        <form method="POST" class="mb-0"
+                                                            action="{{ route('internal.assistance.participants.status', ['assistance_user' => $participant->id]) }}">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <select name="status"
+                                                                    class="form-select form-select-sm w-auto">
+                                                                    <option value="" disabled selected>Pilih Status
+                                                                    </option>
+                                                                    <option value="LULUS">TERIMA</option>
+                                                                    <option value="TIDAK_LULUS">TOLAK</option>
+                                                                </select>
+                                                                <button type="submit"
+                                                                    class="btn btn-sm btn-success">Update</button>
+                                                            </div>
+                                                        </form>
+                                                    @endif
+                                                </div>
+                                            </td>
                                             <td>
-                                                <button class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                                    data-bs-target="#detailModal{{ $participant->id }}">
-                                                    Detail
-                                                </button>
+                                                <div class="d-flex align-items-center gap-2" style="min-width: 34px;">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-info rounded-circle d-inline-flex align-items-center justify-content-center"
+                                                            style="width: 34px; height: 34px;"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#detailModal{{ $participant->id }}"
+                                                            title="Detail Profil"
+                                                            aria-label="Detail Profil {{ $participant->user->name }}">
+                                                            <i class="ti ti-user fs-4"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
 
                                                 <!-- Modal Detail -->
                                                 <div class="modal fade" id="detailModal{{ $participant->id }}"
@@ -111,6 +103,17 @@
                                                             </div>
                                                             <div class="modal-body">
                                                                 <div class="container">
+                                                                    <div class="text-center mb-4">
+                                                                        <img src="{{ $participant->user->photo ? asset('storage/' . $participant->user->photo) : asset('assets/images/profile/user-1.jpg') }}"
+                                                                            alt="Foto Profil {{ $participant->user->name }}"
+                                                                            class="rounded-circle border shadow-sm"
+                                                                            width="120" height="120"
+                                                                            style="object-fit: cover;">
+                                                                        <h6 class="fw-semibold mt-3 mb-0">
+                                                                            {{ $participant->user->name }}
+                                                                        </h6>
+                                                                    </div>
+
                                                                     <div class="row">
                                                                         <div class="col-md-6">
                                                                             <p class="mb-1 text-muted">Nama Lengkap</p>
@@ -157,22 +160,22 @@
                                                                         <div class="col-md-6">
                                                                             <p class="mb-1 text-muted">Provinsi</p>
                                                                             <p class="fw-semibold">
-                                                                                {{ $participant->user->province }}</p>
+                                                                                {{ $participant->user->nusaProvince?->name ?? '-' }}</p>
                                                                         </div>
                                                                         <div class="col-md-6">
                                                                             <p class="mb-1 text-muted">Kota/Kab</p>
                                                                             <p class="fw-semibold">
-                                                                                {{ $participant->user->city }}</p>
+                                                                                {{ $participant->user->nusaRegency?->name ?? '-' }}</p>
                                                                         </div>
                                                                         <div class="col-md-6">
                                                                             <p class="mb-1 text-muted">Kecamatan</p>
                                                                             <p class="fw-semibold">
-                                                                                {{ $participant->user->district }}</p>
+                                                                                {{ $participant->user->nusaDistrict?->name ?? '-' }}</p>
                                                                         </div>
                                                                         <div class="col-md-6">
                                                                             <p class="mb-1 text-muted">Desa/Kelurahan</p>
                                                                             <p class="fw-semibold">
-                                                                                {{ $participant->user->village }}</p>
+                                                                                {{ $participant->user->nusaVillage?->name ?? '-' }}</p>
                                                                         </div>
                                                                     </div>
 

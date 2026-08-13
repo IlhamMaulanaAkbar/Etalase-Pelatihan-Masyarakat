@@ -188,16 +188,16 @@
                         {{ $user->religion }}
                     </td>
                     <td>
-                        {{ $user->province }}
+                        {{ $user->nusaProvince?->name ?? '-' }}
                     </td>
                     <td>
-                        {{ $user->city }}
+                        {{ $user->nusaRegency?->name ?? '-' }}
                     </td>
                     <td>
-                        {{ $user->district }}
+                        {{ $user->nusaDistrict?->name ?? '-' }}
                     </td>
                     <td>
-                        {{ $user->village }}
+                        {{ $user->nusaVillage?->name ?? '-' }}
                     </td>
                     <td>
                         {{ $user->job }}

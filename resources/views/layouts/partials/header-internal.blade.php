@@ -29,9 +29,24 @@
 
                     <div class="message-body">
                         @forelse($notifications as $notif)
+                            @php
+                                $notificationUser = isset($notif['user_id'])
+                                    ? \App\Models\User::find($notif['user_id'])
+                                    : \App\Models\User::where('name', $notif['user_name'] ?? null)
+                                        ->orderByRaw('photo IS NULL')
+                                        ->latest()
+                                        ->first();
+
+                                $notificationPhoto = $notif['user_photo'] ?? $notificationUser?->photo;
+
+                                $notificationPhotoUrl = $notificationPhoto
+                                    ? asset('storage/' . $notificationPhoto)
+                                    : asset('assets/images/profile/user-1.jpg');
+                            @endphp
                             <a href="#" class="dropdown-item d-flex align-items-start gap-3 py-2 px-3">
-                                <img src="https://i.pravatar.cc/40?u={{ $notif['user_name'] }}" alt="User"
-                                    class="rounded-circle flex-shrink-0" width="40" height="40">
+                                <img src="{{ $notificationPhotoUrl }}" alt="User"
+                                    class="rounded-circle flex-shrink-0" width="40" height="40"
+                                    style="object-fit: cover;">
 
                                 <div class="flex-grow-1 overflow-hidden">
                                     <h6 class="mb-0 fw-semibold">

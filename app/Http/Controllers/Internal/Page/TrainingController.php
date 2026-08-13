@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Internal\Page;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Training;
+use App\Services\TrainingAssessmentTemplateCopier;
 use App\Services\Supports\Alert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -27,7 +28,7 @@ class TrainingController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, TrainingAssessmentTemplateCopier $templateCopier)
     {
         $request->validate([
             'training_name' => 'required|string|max:128',
@@ -54,6 +55,7 @@ class TrainingController extends Controller
         $training->description = $request->description;
         $training->target_audience = $request->target_audience;
         if ($training->save()) {
+            $templateCopier->copyForTraining($training);
             Alert::success('Pelatihan berhasil disimpan.');
         } else {
             Alert::error('Gagal menyimpan Pelatihan.');

@@ -10,10 +10,10 @@
             'place_of_birth',
             'phone',
             'gender',
-            'province',
-            'city',
-            'district',
-            'village',
+            'province_code',
+            'regency_code',
+            'district_code',
+            'village_code',
             'job',
             'education',
             'education_institutions',
@@ -34,6 +34,7 @@
 @section('content')
     <section class="bg-white">
         <div class="container py-5">
+            @include('layouts.partials.alert')
 
             {{-- Header --}}
             <div class="bg-primary text-white p-4 rounded mb-4">
@@ -126,7 +127,186 @@
                         </div>
 
                         <div class="tab-pane fade" id="silabus" role="tabpanel">
-                            <p>Silabus akan ditampilkan di sini.</p>
+                            <p class="fw-semibold text-black mb-4">Jadwal Pendampingan ({{ $totalJp }} JP)</p>
+
+                            <div class="position-relative ms-4">
+                                @if ($schedules->count() > 1)
+                                    <div class="position-absolute top-0 start-0 border-start border-2 border-light"
+                                        style="height: 100%; left: 0.5rem;"></div>
+                                @endif
+
+                                @forelse ($schedules as $schedule)
+                                    @php
+                                        $attendance = $attendancesBySchedule->get($schedule->id);
+                                        $attendanceWindow = $attendanceWindows->get($schedule->id);
+                                        $attendanceBadgeClass = match ($attendance?->status) {
+                                            'Hadir' => 'success',
+                                            'Sakit' => 'warning',
+                                            'Izin' => 'info',
+                                            'Tidak Hadir' => 'danger',
+                                            default => 'secondary',
+                                        };
+                                    @endphp
+
+                                    <div class="d-flex position-relative mb-3">
+                                        <div class="bg-primary rounded-circle position-absolute"
+                                            style="width: 12px; height: 12px; left: -0.3rem; top: 0.4rem;">
+                                        </div>
+
+                                        <div class="card w-100 ms-4">
+                                            <div class="card-body">
+                                                <div
+                                                    class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                                                    <div>
+                                                        <h6 class="fw-bold mb-2">Pertemuan
+                                                            {{ $schedule->meeting_number }}:
+                                                            {{ $schedule->material_title }}</h6>
+                                                        <div class="text-muted small">
+                                                            <i class="bi bi-clock"></i>
+                                                            {{ $schedule->date->format('d M Y') }},
+                                                            {{ substr($schedule->start_time, 0, 5) }} -
+                                                            {{ substr($schedule->end_time, 0, 5) }}
+                                                            @if ($schedule->duration)
+                                                                | {{ $schedule->duration }} JP
+                                                            @endif
+                                                        </div>
+                                                        @if ($attendance)
+                                                            <span
+                                                                class="badge bg-{{ $attendanceBadgeClass }} mt-2">Absensi:
+                                                                {{ $attendance->status }}</span>
+                                                        @endif
+                                                    </div>
+                                                    @if ($isAcceptedParticipant)
+                                                        <div>
+                                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#scheduleDetailModal{{ $schedule->id }}">
+                                                                <i class="bi bi-eye"></i> Detail
+                                                            </button>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if ($isAcceptedParticipant)
+                                        <div class="modal fade" id="scheduleDetailModal{{ $schedule->id }}" tabindex="-1"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                <div class="modal-content rounded-3">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Detail Pertemuan
+                                                            {{ $schedule->meeting_number }}</h5>
+                                                        <button type="button" class="btn-close"
+                                                            data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <dl class="row mb-0">
+                                                            <dt class="col-sm-4">Judul Pertemuan</dt>
+                                                            <dd class="col-sm-8">{{ $schedule->material_title }}</dd>
+
+                                                            <dt class="col-sm-4">Hari Pertemuan</dt>
+                                                            <dd class="col-sm-8">
+                                                                {{ $schedule->date->translatedFormat('l, d F Y') }}</dd>
+
+                                                            <dt class="col-sm-4">Waktu Pertemuan</dt>
+                                                            <dd class="col-sm-8">{{ substr($schedule->start_time, 0, 5) }}
+                                                                - {{ substr($schedule->end_time, 0, 5) }} WITA</dd>
+
+                                                            <dt class="col-sm-4">Jam Pelajaran</dt>
+                                                            <dd class="col-sm-8">{{ $schedule->duration ?? '-' }} JP</dd>
+
+                                                            <dt class="col-sm-4">File Materi</dt>
+                                                            <dd class="col-sm-8">
+                                                                @if ($schedule->file)
+                                                                    <a href="{{ asset('storage/' . $schedule->file) }}"
+                                                                        target="_blank"
+                                                                        class="btn btn-sm btn-outline-primary">
+                                                                        <i class="bi bi-file-earmark-text"></i> Lihat File
+                                                                        Materi
+                                                                    </a>
+                                                                @else
+                                                                    <span class="text-muted">Belum ada file materi.</span>
+                                                                @endif
+                                                            </dd>
+                                                        </dl>
+
+                                                        @if ($schedule->material_description)
+                                                            <div class="mt-3">
+                                                                <div class="fw-semibold">Deskripsi Materi</div>
+                                                                <p class="mb-0">{{ $schedule->material_description }}</p>
+                                                            </div>
+                                                        @endif
+
+                                                        <hr>
+
+                                                        <h6 class="fw-bold">Absensi</h6>
+                                                        @if ($attendance)
+                                                            <div class="alert alert-info">
+                                                                Absensi saat ini:
+                                                                <strong>{{ $attendance->status }}</strong>
+                                                                @if ($attendance->attendance_time)
+                                                                    pada {{ substr($attendance->attendance_time, 0, 5) }}
+                                                                @endif
+                                                            </div>
+                                                            <p class="text-muted mb-0">Absensi sudah dikirim dan tidak
+                                                                dapat diubah kembali.</p>
+                                                        @elseif (!$attendanceWindow['has_started'])
+                                                            <div class="alert alert-warning mb-0">
+                                                                Absensi belum dibuka. Absensi dibuka pada
+                                                                {{ $attendanceWindow['starts_at']->format('d M Y H:i') }}.
+                                                            </div>
+                                                        @elseif ($attendanceWindow['has_ended'])
+                                                            <div class="alert alert-danger mb-0">
+                                                                Absensi sudah ditutup pada
+                                                                {{ $attendanceWindow['ends_at']->format('d M Y H:i') }}.
+                                                                Peserta yang belum absen akan dianggap Tidak Hadir.
+                                                            </div>
+                                                        @else
+                                                            <form method="POST"
+                                                                action="{{ route('public.assistance.attendance.store', [$assistance, $schedule]) }}">
+                                                                @csrf
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Status Kehadiran</label>
+                                                                    <select name="status" class="form-select" required>
+                                                                        @foreach (['Hadir', 'Tidak Hadir', 'Izin', 'Sakit'] as $status)
+                                                                            <option value="{{ $status }}"
+                                                                                @selected(old('status', 'Hadir') === $status)>
+                                                                                {{ $status }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                    @error('status')
+                                                                        <div class="text-danger small mt-1">
+                                                                            {{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Catatan</label>
+                                                                    <textarea name="note" class="form-control" rows="3" placeholder="Opsional">{{ old('note') }}</textarea>
+                                                                    @error('note')
+                                                                        <div class="text-danger small mt-1">
+                                                                            {{ $message }}</div>
+                                                                    @enderror
+                                                                </div>
+                                                                <button type="submit" class="btn btn-primary">
+                                                                    <i class="bi bi-check2-circle"></i> Simpan
+                                                                    Absensi
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @empty
+                                    <div class="border-top border-bottom py-4 text-center">
+                                        <p class="mb-0">Tidak ada Jadwal Pendampingan Yang Tersedia.</p>
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
 
                         <div class="tab-pane fade" id="peserta" role="tabpanel">

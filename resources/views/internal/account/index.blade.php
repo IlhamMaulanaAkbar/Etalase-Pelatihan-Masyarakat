@@ -51,19 +51,19 @@
                     <div class="row mb-3">
                         <div class="col-md-6 mb-3">
                             <div class="fw-semibold text-black">Provinsi</div>
-                            <div>{{ $user->province ?? '-' }}</div>
+                            <div>{{ $user->nusaProvince?->name ?? '-' }}</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="fw-semibold text-black">Kota/Kab</div>
-                            <div>{{ $user->city ?? '-' }}</div>
+                            <div>{{ $user->nusaRegency?->name ?? '-' }}</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="fw-semibold text-black">Kecamatan</div>
-                            <div>{{ $user->district ?? '-' }}</div>
+                            <div>{{ $user->nusaDistrict?->name ?? '-' }}</div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="fw-semibold text-black">Desa/Kelurahan</div>
-                            <div>{{ $user->village ?? '-' }}</div>
+                            <div>{{ $user->nusaVillage?->name ?? '-' }}</div>
                         </div>
                     </div>
 
