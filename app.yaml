@@ -1,20 +1,14 @@
-kind: wasmer.io/App.v0
-
-owner: ilhammaulanaakbar
 name: etalase-pelatihan-masyarakat
-
+owner: ilhammaulanaakbar
 package: .
-
-env:
-  PUBLIC_STORAGE_PATH: "/app/public/storage"
-
-volumes:
-  - name: public-uploads
-    mount: /app/public/storage
-
 locality:
   regions:
-    - us-socal1
-
+  - fr-roub1
+env:
+  PUBLIC_STORAGE_PATH: /app/public/storage
+volumes:
+- name: public-uploads
+  mount: /app/public/storage
 scaling:
   mode: single_concurrency
+kind: wasmer.io/App.v0
