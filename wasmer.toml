@@ -15,5 +15,5 @@ main-args = [
     "localhost:8080",
     "-t",
     "/app/public",
-    "/app/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php"
+    "/app/server.php"
 ]
