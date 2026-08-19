@@ -48,11 +48,19 @@
                                             autocomplete="off">
                                     </div>
                                     <div class="mb-3 text-center">
-                                        {!! NoCaptcha::renderJs() !!}
+                                        @if (filled(config('captcha.sitekey')))
+                                            <script src="{{ config('captcha.client_url') }}?hl={{ rawurlencode(app()->getLocale()) }}"
+                                                async defer></script>
 
-                                        <div class="d-flex justify-content-center">
-                                            {!! NoCaptcha::display() !!}
-                                        </div>
+                                            <div class="d-flex justify-content-center">
+                                                <div class="g-recaptcha"
+                                                    data-sitekey="{{ config('captcha.sitekey') }}"></div>
+                                            </div>
+                                        @else
+                                            <div class="alert alert-warning mb-0" role="alert">
+                                                Layanan captcha belum dikonfigurasi.
+                                            </div>
+                                        @endif
 
                                         @error('g-recaptcha-response')
                                             <div class="text-danger mt-2">{{ $message }}</div>

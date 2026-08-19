@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth\User;
 
+use App\Rules\ValidCaptcha;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class LoginController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required',
-            'g-recaptcha-response' => 'required|captcha',
+            'g-recaptcha-response' => ['bail', 'required', new ValidCaptcha],
         ]);
 
         if ($validator->fails()) {

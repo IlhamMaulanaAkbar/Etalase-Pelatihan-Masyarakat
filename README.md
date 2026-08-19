@@ -7,6 +7,40 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## reCAPTCHA on Wasmer Edge
+
+The login page uses Google reCAPTCHA v2 through the configurable
+`www.recaptcha.net` endpoints. Before deploying:
+
+1. In the Google reCAPTCHA console, add both `localhost` (for local
+   development) and the exact Wasmer hostname, such as
+   `my-app.wasmer.app`, to the key's allowed domains. Add the custom web
+   domain too when one is used.
+2. Store the production credentials as Wasmer Secrets. Do not put them in
+   `wasmer.toml`, `app.yaml`, or a committed `.env` file:
+
+   ```shell
+   wasmer app secrets create NOCAPTCHA_SITEKEY "your-site-key"
+   wasmer app secrets create NOCAPTCHA_SECRET "your-secret-key"
+   ```
+
+   Use `wasmer app secrets update` instead when a secret already exists. If
+   the current directory does not yet contain a complete `app.yaml`, add
+   `--app owner/app-name` to each command.
+3. Set these non-secret values in the app's `env` section if hostname
+   checking should also be enforced by this application:
+
+   ```yaml
+   env:
+     APP_URL: "https://my-app.wasmer.app"
+     NOCAPTCHA_ALLOWED_HOSTNAMES: "my-app.wasmer.app,www.example.com"
+   ```
+4. Redeploy the app. If Laravel configuration was cached in the deployed
+   files, clear it before packaging with `php artisan config:clear`.
+
+The optional hostname list is comma-separated and must contain exact
+hostnames without a scheme, port, or path.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

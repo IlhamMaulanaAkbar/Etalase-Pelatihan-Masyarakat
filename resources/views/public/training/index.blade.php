@@ -98,8 +98,7 @@
                 @foreach ($trainings as $training)
                     <div class="col">
                         <div class="card d-flex flex-column shadow-sm h-100">
-                            <img src="{{ asset('storage/' . $training->thumbnail_image) }}" class="card-img-top"
-                                alt="Pelatihan">
+                            <img src="{{ asset($training->thumbnail_image) }}" class="card-img-top" alt="Pelatihan">
 
                             {{-- Card Body --}}
                             <div class="card-body flex-grow-1 d-flex flex-column">
