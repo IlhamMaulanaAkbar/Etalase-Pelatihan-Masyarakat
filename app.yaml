@@ -3,14 +3,18 @@ kind: wasmer.io/App.v0
 owner: ilhammaulanaakbar
 name: etalase-pelatihan-masyarakat
 
-# Menggunakan package dari wasmer.toml di project ini
 package: .
 
-# Environment khusus filesystem upload Laravel
 env:
   PUBLIC_STORAGE_PATH: "/app/public/storage"
 
-# Persistent storage untuk semua file upload
 volumes:
   - name: public-uploads
     mount: /app/public/storage
+
+locality:
+  regions:
+    - us-socal1
+
+scaling:
+  mode: single_concurrency
